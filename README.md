@@ -13,7 +13,7 @@ This project creates an interactive dashboard using Plotly Dash to explore music
 [Kaggle Spotify Dataset](https://www.kaggle.com/datasets/iamsumat/spotify-top-2000s-mega-dataset)
 
 ## 📁 Project Structure
-
+```
 spotify-dashboard/
 ├── data/
 │ └── spotify_dataset.csv
@@ -22,3 +22,4 @@ spotify-dashboard/
 ├── app.py
 ├── requirements.txt
 └── README.md
+```
