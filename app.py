@@ -5,15 +5,13 @@ import random
 import numpy as np
 import pandas as pd
 import seaborn as sns
+import plotly.express as px
+from scipy import stats as st
+from scipy import stats as st
 import matplotlib.pyplot as plt
-from scipy import stats as st
-from scipy import stats as st
 import warnings
 warnings.filterwarnings('ignore')
-
 from dash import Dash, html, dcc, callback, Output, Input
-
-import plotly.express as px
 
 # Load the dataset and read the data correctly
 data = pd.read_csv('datasets/spotify.csv')
@@ -27,21 +25,47 @@ data['length_duration'] = data['length_duration'].str.replace(',', '')
 # Convert 'length_duration' column to integer data type
 data['length_duration'] = data['length_duration'].astype(int)
 
-demo_app = Dash()
+app = Dash()
 
-demo_app.layout = [
-    html.H1(children='Soon-To-Be-Titled Spotify Analyzer', style={'textAlign':'center'}),
-    dcc.Dropdown(data['year'].unique(), value=2004, id='dropdown-selection'),
-    dcc.Graph(id='graph-content')
-]
+# App layout
+app.layout = html.Div([
+    html.H1('Spotify Dashboard 🎵'),
+    html.Label('Select Genre:'),
+    dcc.Dropdown(
+        id='top_genre-dropdown',
+        options=[{'label': genre, 'value': genre} for genre in data['top_genre'].unique()],
+        value=data['top_genre'].unique()[0]
+    ),
+    html.Label('Select Year Range:'),
+    dcc.RangeSlider(
+        id='year-slider',
+        min=data['year'].min(),
+        max=data['year'].max(),
+        step=1,
+        marks={str(year): str(year) for year in range(data['year'].min(), data['year'].max()+1, 5)},
+        value=[data['year'].min(), data['year'].max()]
+    ),
+    dcc.Graph(id='popularity-graph'),
+])
 
-@callback(
-    Output('graph-content', 'figure'),
-    Input('dropdown-selection', 'value')
+# Callbacks for interactivity
+@app.callback(
+    Output('popularity-graph', 'figure'),
+    Input('top_genre-dropdown', 'value'),
+    Input('year-slider', 'value')
 )
-def update_graph(value):
-    dff = data[data['year']==value].sort_values(by='beats_per_minute_bpm', axis=0)
-    return px.line(dff, x='beats_per_minute_bpm', y='popularity')
+def update_graph(selected_genre, year_range):
+    filtered_data = data[(data['top_genre'] == selected_genre) &
+                      (data['year'] >= year_range[0]) &
+                      (data['year'] <= year_range[1])]
+    
+    fig = px.scatter(filtered_data, 
+                     x='danceability', 
+                     y='popularity',
+                     color='energy',
+                     hover_data=['artist', 'title', 'year'])
+    return fig
 
-if __name__ == '__main__': 
-    demo_app.run(debug=True, port=7124)
+# Run the app
+if __name__ == '__main__':
+    app.run(debug=True, port=7124)
