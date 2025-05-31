@@ -44,4 +44,4 @@ def update_graph(value):
     return px.line(dff, x='beats_per_minute_bpm', y='popularity')
 
 if __name__ == '__main__': 
-    demo_app.run(debug=True)
+    demo_app.run(debug=True, port=7124)
