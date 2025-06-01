@@ -62,8 +62,9 @@ CLIENT_SECRET = ""
 
 # get spotify API information from secrets.txt
 with open('secrets.txt', 'r') as file:
-    CLIENT_ID = file.readline()
-    CLIENT_SECRET= file.readline()
+    config = file.read().splitlines()
+    CLIENT_ID = config[0]
+    CLIENT_SECRET = config[1]
 
 # instantiate spotipy
 auth_manager = SpotifyClientCredentials(
@@ -95,10 +96,9 @@ app.layout = html.Div([
             placeholder='Select title...'
         ),
         html.Div([
-            html.Audio(
-                id='audio-player',
-                controls=True
-            )     
+            html.Iframe(
+                id='audio-player'
+            )
         ])
            
     ]),
@@ -188,8 +188,11 @@ def get_preview_audio(artist_and_title):
 
     print(query)
     search_result = sp.search(q=query, type='track', limit=1)
-    print(type(search_result))
-    return ""
+    track_id = search_result["tracks"]["items"][0]["id"]
+    print("track id:", track_id)
+    src = "https://open.spotify.com/embed/track/" + track_id + "?utm_source=generator"
+    print("src:", src)
+    return src
 
 #callback that updates graph when genre is selected, or when year slider or plot type radio button are used
 @app.callback(
