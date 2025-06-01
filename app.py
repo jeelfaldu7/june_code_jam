@@ -46,6 +46,15 @@ app.layout = html.Div([
         value=[data['year'].min(), data['year'].max()]
     ),
     dcc.Graph(id='popularity-graph'),
+    dcc.RadioItems(
+        id='plot-type',
+        options=[
+            {'label': 'Scatter Plot', 'value':'scatter'},
+            {'label': 'Box Plot', 'value': 'box'}
+        ],
+        value='scatter', 
+        labelStyle={'display': 'inline-block', 'margin-right': '10px'}
+    ),
 ])
 
 # Callbacks for interactivity
