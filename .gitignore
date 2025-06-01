@@ -1,3 +1,6 @@
 # secrets.txt contains information required to access the spotify API
 # if you are hosting a copy of the app, put your client ID and secret in it
 secrets.txt
+
+# file created by spotify API credential manager, no need to commit
+.cache
