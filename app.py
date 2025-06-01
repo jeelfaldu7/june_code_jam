@@ -85,7 +85,6 @@ def update_graph(selected_genre, year_range, plot_type):
             x='year',
             y='popularity',
             color='energy',
-            points='all',  # show all points
             hover_data=['artist', 'title', 'year']
         )
     return fig
