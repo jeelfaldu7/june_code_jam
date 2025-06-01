@@ -25,6 +25,9 @@ data['length_duration'] = data['length_duration'].str.replace(',', '')
 # Convert 'length_duration' column to integer data type
 data['length_duration'] = data['length_duration'].astype(int)
 
+# Compute the correlation matrix
+corr_matrix = data.corr(numeric_only=True)
+
 app = Dash()
 
 # App layout
@@ -56,6 +59,20 @@ app.layout = html.Div([
         value='scatter', 
         labelStyle={'display': 'inline-block', 'margin-right': '10px'}
     ),
+    html.H1("Interactive Correlation Heatmap"),
+    dcc.Graph(
+        id='heatmap',
+        figure=px.imshow(
+            corr_matrix,
+            x=corr_matrix.columns,
+            y=corr_matrix.columns,
+            color_continuous_scale='RdBu_r',
+            zmin=-1,
+            zmax=1,
+            text_auto=True 
+        )
+    ),
+    html.Div(id='click-info', style={'marginTop': 20, 'fontWeight': 'bold'})
 ])
 
 # Callbacks for interactivity
