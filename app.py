@@ -30,6 +30,20 @@ corr_matrix = data.corr(numeric_only=True)
 
 app = Dash()
 
+corr_fig = px.imshow(
+    corr_matrix,
+    x=corr_matrix.columns,
+    y=corr_matrix.columns,
+    color_continuous_scale='RdBu_r',
+    zmin=-1,
+    zmax=1,
+    text_auto=True 
+)
+corr_fig.update_layout(
+    height=800,
+    width=800
+)
+
 # App layout
 app.layout = html.Div([
     html.H1('Spotify Dashboard 🎵'),
@@ -48,7 +62,6 @@ app.layout = html.Div([
         marks={str(year): str(year) for year in range(data['year'].min(), data['year'].max()+1, 5)},
         value=[data['year'].min(), data['year'].max()]
     ),
-    dcc.Graph(id='popularity-graph'),
     html.Label('Select Plot Type:'),
     dcc.RadioItems(
         id='plot_type',
@@ -59,18 +72,12 @@ app.layout = html.Div([
         value='scatter', 
         labelStyle={'display': 'inline-block', 'margin-right': '10px'}
     ),
-    html.H1("Interactive Correlation Heatmap"),
+    dcc.Graph(id='popularity-graph'),
+    
+    html.H2("Interactive Correlation Heatmap"),
     dcc.Graph(
         id='heatmap',
-        figure=px.imshow(
-            corr_matrix,
-            x=corr_matrix.columns,
-            y=corr_matrix.columns,
-            color_continuous_scale='RdBu_r',
-            zmin=-1,
-            zmax=1,
-            text_auto=True 
-        )
+        figure=corr_fig
     ),
     html.Div(id='click-info', style={'marginTop': 20, 'fontWeight': 'bold'})
 ])
