@@ -25,6 +25,31 @@ data['length_duration'] = data['length_duration'].str.replace(',', '')
 # Convert 'length_duration' column to integer data type
 data['length_duration'] = data['length_duration'].astype(int)
 
+data['genre_group'] = data['top_genre'].copy()
+
+def make_freq_dict(series):
+    #convert pd.Series to concatenated string
+    words = " ".join(series.unique()).split(" ")
+
+    #create a dictionary; if word exists, increment its number, otherwise make it exist and give it a counter of 1
+    dictionary = {}
+    for i in words:
+        if i in dictionary:
+            dictionary[i] += 1
+        else:
+            dictionary[i] = 1
+        
+    return dictionary
+
+#leave entries that don't contain 'pop' alone; replace those that do with just 'pop'
+data['genre_group'].where(~data['genre_group'].str.contains('pop'), 'pop', inplace=True)
+data['genre_group'].where(~data['genre_group'].str.contains('rock'), 'rock', inplace=True)
+data['genre_group'].where(~data['genre_group'].str.contains('hip hop'), 'hip hop', inplace=True)
+data['genre_group'].where(~data['genre_group'].str.contains('metal'), 'metal', inplace=True)
+data['genre_group'].where(~data['genre_group'].str.contains('folk'), 'folk', inplace=True)
+data['genre_group'].where(~data['genre_group'].str.contains('country'), 'country', inplace=True)
+data['genre_group'].where(~data['genre_group'].str.contains('soul'), 'soul', inplace=True)
+
 # Compute the correlation matrix
 corr_matrix = data.corr(numeric_only=True)
 
@@ -54,9 +79,9 @@ app.layout = html.Div([
     html.H1('Spotify Dashboard 🎵'),
     html.Label('Select Genre:'),
     dcc.Dropdown(
-        id='top_genre-dropdown',
-        options=[{'label': genre, 'value': genre} for genre in data['top_genre'].unique()],
-        value=data['top_genre'].unique()[0]
+        id='genre_group-dropdown',
+        options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
+        value=data['genre_group'].unique()[0]
     ),
     html.Label('Select Year Range:'),
     dcc.RangeSlider(
@@ -90,12 +115,12 @@ app.layout = html.Div([
 # Callbacks for interactivity
 @app.callback(
     Output('popularity-graph', 'figure'),
-    Input('top_genre-dropdown', 'value'),
+    Input('genre_group-dropdown', 'value'),
     Input('year-slider', 'value'), 
     Input('plot_type', 'value')
 )
 def update_graph(selected_genre, year_range, plot_type):
-    filtered_data = data[(data['top_genre'] == selected_genre) &
+    filtered_data = data[(data['genre_group'] == selected_genre) &
                       (data['year'] >= year_range[0]) &
                       (data['year'] <= year_range[1])]
     
