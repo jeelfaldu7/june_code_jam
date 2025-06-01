@@ -88,12 +88,6 @@ def update_graph(selected_genre, year_range, plot_type):
             points='all',  # show all points
             hover_data=['artist', 'title', 'year']
         )
-    
-    fig = px.scatter(filtered_data, 
-                     x='danceability', 
-                     y='popularity',
-                     color='energy',
-                     hover_data=['artist', 'title', 'year'])
     return fig
 
 # Run the app
