@@ -82,6 +82,9 @@ app = Dash()
 # App layout
 app.layout = html.Div([
     html.H1('Spotify Dashboard 🎵', style={'textAlign': 'center'}),
+    html.H2('Popularity by Genre (Top 25 Most Popular)'),
+    dcc.Graph(id='popularity-by-genre-graph'),
+
     html.Label('Select Genre:'),
     dcc.Dropdown(
         id='genre_group-dropdown',
@@ -202,7 +205,6 @@ def get_preview_audio(artist_and_title):
     Input('plot_type', 'value')
 )
 def update_graph(selected_genre, year_range, plot_type):
-    print("Callback triggered!") 
     filtered_data = data[(data['genre_group'] == selected_genre) &
                       (data['year'] >= year_range[0]) &
                       (data['year'] <= year_range[1])]
@@ -248,6 +250,28 @@ def update_graph(selected_genre, year_range, plot_type):
         )
 
     return fig
+
+@app.callback(
+    Output('popularity-by-genre-graph', 'figure'),
+    Input('genre_group-dropdown', 'value')  # just to trigger once on app load
+)
+def update_popularity_by_genre(_):
+    pop_genre = data.groupby('genre_group')['popularity'].mean().sort_values(ascending=False).head(25).reset_index()
+
+    fig = px.bar(
+        pop_genre,
+        x='popularity',
+        y='genre_group',
+        orientation='h',
+        title='Popularity by Genre (Top 25 Most Popular)',
+        labels={'popularity': 'Average Popularity', 'genre_group': 'Genres'},
+        color='popularity',
+        color_continuous_scale='Blues'
+    )
+    fig.update_layout(yaxis=dict(autorange="reversed"))  # highest popularity on top
+
+    return fig
+
 
 # Run the app
 if __name__ == '__main__':
