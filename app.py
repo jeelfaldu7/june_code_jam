@@ -11,7 +11,7 @@ from scipy import stats as st
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
-from dash import Dash, html, dcc, callback, Output, Input
+from dash import Dash, html, dcc, callback, Output, Input, State
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -52,6 +52,8 @@ data['genre_group'].where(~data['genre_group'].str.contains('folk'), 'folk', inp
 data['genre_group'].where(~data['genre_group'].str.contains('country'), 'country', inplace=True)
 data['genre_group'].where(~data['genre_group'].str.contains('soul'), 'soul', inplace=True)
 
+#TODO truncate genre_group to keep options from getting too cluttered
+
 # Compute the correlation matrix
 corr_matrix = data.corr(numeric_only=True)
 
@@ -64,10 +66,15 @@ with open('secrets.txt', 'r') as file:
     CLIENT_SECRET= file.readline()
 
 # instantiate spotipy
-sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
+auth_manager = SpotifyClientCredentials(
     client_id=CLIENT_ID,
     client_secret=CLIENT_SECRET
-))
+)
+
+# print("client id ", CLIENT_ID)
+# print("client secret ", CLIENT_SECRET)
+
+sp = spotipy.Spotify(auth_manager=auth_manager, client_credentials_manager=auth_manager)
 
 app = Dash()
 
@@ -84,11 +91,17 @@ app.layout = html.Div([
     html.Div([
         html.Label('Preview Song from Genre:'),
         dcc.Dropdown(
-                id='preview-dropdown', 
-                placeholder='Select title...'
-        )
+            id='preview-dropdown', 
+            placeholder='Select title...'
+        ),
+        html.Div([
+            html.Audio(
+                id='audio-player',
+                controls=True
+            )     
         ])
-        ,
+           
+    ]),
     html.Label('Select Year Range:'),
     dcc.RangeSlider(
         id='year-slider',
@@ -135,6 +148,8 @@ app.layout = html.Div([
 ])
 
 # Callbacks for interactivity
+
+#callback that updates track preview dropdown when genre is selected
 @app.callback(
     Output('preview-dropdown', 'options'),
     Input('genre_group-dropdown', 'value'),
@@ -144,12 +159,39 @@ def update_preview_list(selected_genre):
     titles = genre_filter['title']
     artists = genre_filter['artist']
     labels = genre_filter['artist'] + " - " + genre_filter['title']
-    #TODO create this column in the dataframe, then implement a button to play preview from spotify API
-    #values = genre_filter['spotify_track_id']
-    values = labels
-    results = [{'label': i, 'value': j} for i,j in zip(labels, values)]
-    return [{'label': i, 'value': i} for i in labels]
 
+    #TODO values may need changed depending on the needs of Spotify's API
+    #so "values = labels" here is a placeholder until those needs are determined
+    #values = labels
+    #results = [{'label': i, 'value': j} for i,j in zip(labels, values)]
+    results = [{'label': i, 'value': i} for i in labels]
+    return results
+
+#callback that queries Spotify API when Preview Song dropdown has a selection
+@app.callback(
+    Output('audio-player', 'src'),
+    Input('preview-dropdown', 'value'),
+    prevent_initial_call=True
+)
+def get_preview_audio(artist_and_title):
+    #query the Spotify API for the track
+
+    tags = artist_and_title.split(" - ")
+
+    #note: %3A is HTML URL encoding for colon
+    track='track:' + tags[1]        #e.g. track:"Love Me Tender"      
+    artist=' artist:' + tags[0]     #e.g. artist:"Elvis Presley"
+    query = track + artist
+
+    #for URL encoding, replace spaces with +
+    #query = query.replace(" ", "+")
+
+    print(query)
+    search_result = sp.search(q=query, type='track', limit=1)
+    print(type(search_result))
+    return ""
+
+#callback that updates graph when genre is selected, or when year slider or plot type radio button are used
 @app.callback(
     Output('popularity-graph', 'figure'),
     Input('preview-dropdown', 'value'),
