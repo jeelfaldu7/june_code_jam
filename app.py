@@ -51,7 +51,7 @@ app.layout = html.Div([
         id='plot_type',
         options=[
             {'label': 'Scatter Plot', 'value':'scatter'},
-            {'label': 'Box Plot', 'value': 'box'}
+            {'label': 'Bar Plot', 'value': 'bar'}
         ],
         value='scatter', 
         labelStyle={'display': 'inline-block', 'margin-right': '10px'}
@@ -79,8 +79,8 @@ def update_graph(selected_genre, year_range, plot_type):
             color='energy',
             hover_data=['artist', 'title', 'year']
         )
-    elif plot_type == 'box':
-        fig = px.box(
+    elif plot_type == 'bar':
+        fig = px.bar(
             filtered_data,
             x='year',
             y='popularity',
