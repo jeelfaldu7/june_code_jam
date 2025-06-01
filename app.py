@@ -46,6 +46,7 @@ app.layout = html.Div([
         value=[data['year'].min(), data['year'].max()]
     ),
     dcc.Graph(id='popularity-graph'),
+    html.Label('Select Plot Type:'),
     dcc.RadioItems(
         id='plot-type',
         options=[
@@ -67,6 +68,24 @@ def update_graph(selected_genre, year_range):
     filtered_data = data[(data['top_genre'] == selected_genre) &
                       (data['year'] >= year_range[0]) &
                       (data['year'] <= year_range[1])]
+    # Plot logic depending on the selected plot type
+    if plot_type == 'scatter':
+        fig = px.scatter(
+            filtered_data,
+            x='danceability',
+            y='popularity',
+            color='energy',
+            hover_data=['artist', 'title', 'year']
+        )
+    elif plot_type == 'box':
+        fig = px.box(
+            filtered_data,
+            x='year',
+            y='popularity',
+            color='energy',
+            points='all',  # show all points
+            hover_data=['artist', 'title', 'year']
+        )
     
     fig = px.scatter(filtered_data, 
                      x='danceability', 
