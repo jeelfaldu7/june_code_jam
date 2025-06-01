@@ -39,10 +39,15 @@ corr_fig = px.imshow(
     zmax=1,
     text_auto=True 
 )
+# Make numbers bigger
+corr_fig.update_traces(textfont_size=7)
+
+# Adjust size
 corr_fig.update_layout(
     height=800,
-    width=800
+    width=1000
 )
+
 
 # App layout
 app.layout = html.Div([
