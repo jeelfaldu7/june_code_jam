@@ -12,6 +12,8 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
 from dash import Dash, html, dcc, callback, Output, Input
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
 
 # Load the dataset and read the data correctly
 data = pd.read_csv('datasets/spotify.csv')
@@ -53,6 +55,20 @@ data['genre_group'].where(~data['genre_group'].str.contains('soul'), 'soul', inp
 # Compute the correlation matrix
 corr_matrix = data.corr(numeric_only=True)
 
+CLIENT_ID = ""
+CLIENT_SECRET = ""
+
+# get spotify API information from secrets.txt
+with open('secrets.txt', 'r') as file:
+    CLIENT_ID = file.readline()
+    CLIENT_SECRET= file.readline()
+
+# instantiate spotipy
+sp = spotipy.Spotify(auth_manager=SpotifyClientCredentials(
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET
+))
+
 app = Dash()
 
 # App layout
@@ -64,6 +80,15 @@ app.layout = html.Div([
         options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
         value=data['genre_group'].unique()[0]
     ),
+    # BONUS: audio preview
+    html.Div([
+        html.Label('Preview Song from Genre:'),
+        dcc.Dropdown(
+                id='preview-dropdown', 
+                placeholder='Select title...'
+        )
+        ])
+        ,
     html.Label('Select Year Range:'),
     dcc.RangeSlider(
         id='year-slider',
@@ -111,8 +136,23 @@ app.layout = html.Div([
 
 # Callbacks for interactivity
 @app.callback(
-    Output('popularity-graph', 'figure'),
+    Output('preview-dropdown', 'options'),
     Input('genre_group-dropdown', 'value'),
+)
+def update_preview_list(selected_genre):
+    genre_filter = data[(data['genre_group'] == selected_genre)]
+    titles = genre_filter['title']
+    artists = genre_filter['artist']
+    labels = genre_filter['artist'] + " - " + genre_filter['title']
+    #TODO create this column in the dataframe, then implement a button to play preview from spotify API
+    #values = genre_filter['spotify_track_id']
+    values = labels
+    results = [{'label': i, 'value': j} for i,j in zip(labels, values)]
+    return [{'label': i, 'value': i} for i in labels]
+
+@app.callback(
+    Output('popularity-graph', 'figure'),
+    Input('preview-dropdown', 'value'),
     Input('year-slider', 'value'), 
     Input('plot_type', 'value')
 )
