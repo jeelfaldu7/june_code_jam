@@ -48,7 +48,7 @@ app.layout = html.Div([
     dcc.Graph(id='popularity-graph'),
     html.Label('Select Plot Type:'),
     dcc.RadioItems(
-        id='plot-type',
+        id='plot_type',
         options=[
             {'label': 'Scatter Plot', 'value':'scatter'},
             {'label': 'Box Plot', 'value': 'box'}
@@ -65,10 +65,11 @@ app.layout = html.Div([
     Input('year-slider', 'value'), 
     Input('plot_type', 'value')
 )
-def update_graph(selected_genre, year_range):
+def update_graph(selected_genre, year_range, plot_type):
     filtered_data = data[(data['top_genre'] == selected_genre) &
                       (data['year'] >= year_range[0]) &
                       (data['year'] <= year_range[1])]
+    
     # Plot logic depending on the selected plot type
     if plot_type == 'scatter':
         fig = px.scatter(
