@@ -55,28 +55,9 @@ corr_matrix = data.corr(numeric_only=True)
 
 app = Dash()
 
-corr_fig = px.imshow(
-    corr_matrix,
-    x=corr_matrix.columns,
-    y=corr_matrix.columns,
-    color_continuous_scale='RdBu_r',
-    zmin=-1,
-    zmax=1,
-    text_auto=True 
-)
-# Make numbers bigger
-corr_fig.update_traces(textfont_size=7)
-
-# Adjust size
-corr_fig.update_layout(
-    height=800,
-    width=1000
-)
-
-
 # App layout
 app.layout = html.Div([
-    html.H1('Spotify Dashboard 🎵'),
+    html.H1('Spotify Dashboard 🎵', style={'textAlign': 'center'}),
     html.Label('Select Genre:'),
     dcc.Dropdown(
         id='genre_group-dropdown',
@@ -97,19 +78,35 @@ app.layout = html.Div([
         id='plot_type',
         options=[
             {'label': 'Scatter Plot', 'value':'scatter'},
-            {'label': 'Bar Plot', 'value': 'bar'}
+            {'label': 'Bar Plot', 'value': 'bar'},
         ],
         value='scatter', 
+        inline=True, 
         labelStyle={'display': 'inline-block', 'margin-right': '10px'}
     ),
-    dcc.Graph(id='popularity-graph'),
-    
-    html.H2("Interactive Correlation Heatmap"),
+
+    html.H2('Popularity & Danceability'),
+    dcc.Graph(
+        id='popularity-graph',
+    ),
+
+    html.H2('Interactive Correlation Heatmap'),
     dcc.Graph(
         id='heatmap',
-        figure=corr_fig
-    ),
-    html.Div(id='click-info', style={'marginTop': 20, 'fontWeight': 'bold'})
+        figure = px.imshow(
+            corr_matrix,
+            x=corr_matrix.columns,
+            y=corr_matrix.columns,
+            color_continuous_scale='RdBu_r',
+            zmin=-1,
+            zmax=1,
+            text_auto=True 
+        ).update_layout(
+            height=800,
+            width=1000,
+            margin=dict(l=50, r=50, t=50, b=50)
+        )
+    )
 ])
 
 # Callbacks for interactivity
@@ -131,16 +128,39 @@ def update_graph(selected_genre, year_range, plot_type):
             x='danceability',
             y='popularity',
             color='energy',
-            hover_data=['artist', 'title', 'year']
+            title='Popularity versus Danceability',
+            hover_data=['artist', 'title', 'year'],
         )
+
     elif plot_type == 'bar':
-        fig = px.bar(
-            filtered_data,
-            x='year',
-            y='popularity',
-            color='energy',
-            hover_data=['artist', 'title', 'year']
+        filtered_data = filtered_data.copy()
+        bins = [0, 0.3, 0.6, 1.0]
+        labels = ['Low', 'Medium', 'High']
+
+        # Create the bin column
+        filtered_data['danceability_bin'] = pd.cut(
+            filtered_data['danceability'], 
+            bins=bins, 
+            labels=labels, 
+            include_lowest=True
         )
+
+        # Group by danceability_bin and calculate average popularity
+        danceability_summary = (
+            filtered_data.groupby('danceability_bin')['popularity']
+            .mean()
+            .reset_index()
+        )
+    
+        # Create a bar plot of average popularity for each danceability bin
+        fig = px.bar(
+            danceability_summary,
+            x='danceability_bin',
+            y='popularity',
+            color='danceability_bin',
+            title='Average Popularity by Danceability Bin'
+        )
+
     return fig
 
 # Run the app
