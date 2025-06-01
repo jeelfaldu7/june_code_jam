@@ -117,6 +117,7 @@ app.layout = html.Div([
     Input('plot_type', 'value')
 )
 def update_graph(selected_genre, year_range, plot_type):
+    print("Callback triggered!") 
     filtered_data = data[(data['genre_group'] == selected_genre) &
                       (data['year'] >= year_range[0]) &
                       (data['year'] <= year_range[1])]
@@ -134,7 +135,7 @@ def update_graph(selected_genre, year_range, plot_type):
 
     elif plot_type == 'bar':
         filtered_data = filtered_data.copy()
-        bins = [0, 0.3, 0.6, 1.0]
+        bins = [10,40,70,100]
         labels = ['Low', 'Medium', 'High']
 
         # Create the bin column
