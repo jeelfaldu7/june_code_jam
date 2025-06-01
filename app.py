@@ -62,7 +62,8 @@ app.layout = html.Div([
 @app.callback(
     Output('popularity-graph', 'figure'),
     Input('top_genre-dropdown', 'value'),
-    Input('year-slider', 'value')
+    Input('year-slider', 'value'), 
+    Input('plot_type', 'value')
 )
 def update_graph(selected_genre, year_range):
     filtered_data = data[(data['top_genre'] == selected_genre) &
