@@ -11,7 +11,9 @@ from scipy import stats as st
 import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
-from dash import Dash, html, dcc, callback, Output, Input
+from dash import Dash, html, dcc, callback, Output, Input, State
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
 
 # Load the dataset and read the data correctly
 data = pd.read_csv('datasets/spotify.csv')
@@ -50,8 +52,30 @@ data['genre_group'].where(~data['genre_group'].str.contains('folk'), 'folk', inp
 data['genre_group'].where(~data['genre_group'].str.contains('country'), 'country', inplace=True)
 data['genre_group'].where(~data['genre_group'].str.contains('soul'), 'soul', inplace=True)
 
+#TODO truncate genre_group to keep options from getting too cluttered
+
 # Compute the correlation matrix
 corr_matrix = data.corr(numeric_only=True)
+
+CLIENT_ID = ""
+CLIENT_SECRET = ""
+
+# get spotify API information from secrets.txt
+with open('secrets.txt', 'r') as file:
+    config = file.read().splitlines()
+    CLIENT_ID = config[0]
+    CLIENT_SECRET = config[1]
+
+# instantiate spotipy
+auth_manager = SpotifyClientCredentials(
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET
+)
+
+# print("client id ", CLIENT_ID)
+# print("client secret ", CLIENT_SECRET)
+
+sp = spotipy.Spotify(auth_manager=auth_manager, client_credentials_manager=auth_manager)
 
 app = Dash()
 
@@ -67,6 +91,20 @@ app.layout = html.Div([
         options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
         value=data['genre_group'].unique()[0]
     ),
+    # BONUS: audio preview
+    html.Div([
+        html.Label('Preview Song from Genre:'),
+        dcc.Dropdown(
+            id='preview-dropdown', 
+            placeholder='Select title...'
+        ),
+        html.Div([
+            html.Iframe(
+                id='audio-player'
+            )
+        ])
+           
+    ]),
     html.Label('Select Year Range:'),
     dcc.RangeSlider(
         id='year-slider',
@@ -113,9 +151,56 @@ app.layout = html.Div([
 ])
 
 # Callbacks for interactivity
+
+#callback that updates track preview dropdown when genre is selected
+@app.callback(
+    Output('preview-dropdown', 'options'),
+    Input('genre_group-dropdown', 'value'),
+)
+def update_preview_list(selected_genre):
+    genre_filter = data[(data['genre_group'] == selected_genre)]
+    titles = genre_filter['title']
+    artists = genre_filter['artist']
+    labels = genre_filter['artist'] + " - " + genre_filter['title']
+
+    #TODO values may need changed depending on the needs of Spotify's API
+    #so "values = labels" here is a placeholder until those needs are determined
+    #values = labels
+    #results = [{'label': i, 'value': j} for i,j in zip(labels, values)]
+    results = [{'label': i, 'value': i} for i in labels]
+    return results
+
+#callback that queries Spotify API when Preview Song dropdown has a selection
+@app.callback(
+    Output('audio-player', 'src'),
+    Input('preview-dropdown', 'value'),
+    prevent_initial_call=True
+)
+def get_preview_audio(artist_and_title):
+    #query the Spotify API for the track
+
+    tags = artist_and_title.split(" - ")
+
+    #note: %3A is HTML URL encoding for colon
+    track='track:' + tags[1]        #e.g. track:"Love Me Tender"      
+    artist=' artist:' + tags[0]     #e.g. artist:"Elvis Presley"
+    query = track + artist
+
+    #for URL encoding, replace spaces with +
+    #query = query.replace(" ", "+")
+
+    print(query)
+    search_result = sp.search(q=query, type='track', limit=1)
+    track_id = search_result["tracks"]["items"][0]["id"]
+    print("track id:", track_id)
+    src = "https://open.spotify.com/embed/track/" + track_id + "?utm_source=generator"
+    print("src:", src)
+    return src
+
+#callback that updates graph when genre is selected, or when year slider or plot type radio button are used
 @app.callback(
     Output('popularity-graph', 'figure'),
-    Input('genre_group-dropdown', 'value'),
+    Input('preview-dropdown', 'value'),
     Input('year-slider', 'value'), 
     Input('plot_type', 'value')
 )
