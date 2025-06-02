@@ -468,6 +468,7 @@ def update_artist_graph(_):
         y='popularity',
         color='popularity',
         title='Artists Popularity',
+        orientation='h',
         color_continuous_scale='Blues'
 
     )
