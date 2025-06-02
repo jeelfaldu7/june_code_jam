@@ -207,7 +207,7 @@ app.layout = dbc.Container([
                 inline=True, 
                 labelStyle={'display': 'inline-block', 'margin-right': '10px'}
             ),
-            html.H2('Popularity & Danceability'),
+            html.H2('Popularity & Danceability', className='text-center'),
             dcc.Graph(id='popularity-graph'),
         ], width=12)
     ]),
