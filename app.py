@@ -82,11 +82,11 @@ app = Dash()
 # App layout
 app.layout = html.Div([
     html.H1('Spotify Dashboard 🎵', style={'textAlign': 'center'}),
-    html.H2('Interactive Correlation Heatmap'),
+    html.H2('Interactive Correlation Heatmap', style={'textAlign': 'center'}),
     dcc.Graph(
         id='heatmap',
     ),
-    html.H2('Popularity by Genre (Top 25 Most Popular)'),
+    html.H2('Popularity by Genre (Top 25 Most Popular)', style={'textAlign': 'center'}),
     dcc.Graph(id='popularity-by-genre-graph'),
 
     html.Label('Select Genre:'),
@@ -274,7 +274,7 @@ def update_interactive_heatmap(_):
     )
     fig.update_layout(
             height=800,
-            width=1000,
+            width=1500,
             margin=dict(l=50, r=50, t=50, b=50)
             )
     return fig
