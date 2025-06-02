@@ -12,6 +12,7 @@ import matplotlib.pyplot as plt
 import warnings
 warnings.filterwarnings('ignore')
 from dash import Dash, html, dcc, callback, Output, Input, State
+import dash_bootstrap_components as dbc
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
@@ -77,71 +78,77 @@ auth_manager = SpotifyClientCredentials(
 
 sp = spotipy.Spotify(auth_manager=auth_manager, client_credentials_manager=auth_manager)
 
-app = Dash()
+app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY]) 
+
 
 # App layout
-app.layout = html.Div([
-    html.H1('Spotify Dashboard 🎵', style={'textAlign': 'center'}),
-    html.H2('Interactive Correlation Heatmap', style={'textAlign': 'center'}),
-    dcc.Graph(
-        id='heatmap',
-    ),
-    html.H2('Popularity by Genre (Top 25 Most Popular)', style={'textAlign': 'center'}),
-    dcc.Graph(id='popularity-by-genre-graph'),
-
-    html.Label('Select Genre:'),
-    dcc.Dropdown(
-        id='genre_group-dropdown-graph',
-        options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
-        value=data['genre_group'].unique()[0]
-    ),
-    html.Label('Select Year Range:'),
-    dcc.RangeSlider(
-        id='year-slider',
-        min=data['year'].min(),
-        max=data['year'].max(),
-        step=1,
-        marks={str(year): str(year) for year in range(data['year'].min(), data['year'].max()+1, 5)},
-        value=[data['year'].min(), data['year'].max()]
-    ),
-    html.Label('Select Plot Type:'),
-    dcc.RadioItems(
-        id='plot_type',
-        options=[
-            {'label': 'Scatter Plot', 'value':'scatter'},
-            {'label': 'Bar Plot', 'value': 'bar'},
-        ],
-        value='scatter', 
-        inline=True, 
-        labelStyle={'display': 'inline-block', 'margin-right': '10px'}
-    ),
-
-    html.H2('Popularity & Danceability'),
-    dcc.Graph(
-        id='popularity-graph',
-    ),
-
-    html.Label('Select Genre for Previews:'),
-    dcc.Dropdown(
-        id='genre_group-dropdown-preview',
-        options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
-        value=data['genre_group'].unique()[0]
-    ),
-    # BONUS: audio preview
-    html.Div([
-        html.Label('Preview Song from Genre:'),
-        dcc.Dropdown(
-            id='preview-dropdown', 
-            placeholder='Select title...'
-        ),
-        html.Div([
-            html.Iframe(
-                id='audio-player'
-            )
-        ])
-           
+app.layout = dbc.Container([
+    dbc.Row([
+        dbc.Col(html.H1('Spotify Dashboard 🎵', className='text-center mb-4'), width=12)
     ]),
-])
+    dbc.Row([
+        dbc.Col([
+            html.H2('Interactive Correlation Heatmap', className='text-center'),
+            dcc.Graph(id='heatmap'),
+        ], width=12)
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.H2('Popularity by Genre (Top 25 Most Popular)', className='text-center'),
+            dcc.Graph(id='popularity-by-genre-graph'),
+        ], width=12)
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.Label('Select Genre:'),
+            dcc.Dropdown(
+                id='genre_group-dropdown-graph',
+                options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
+                value=data['genre_group'].unique()[0]
+            ),
+            html.Label('Select Year Range:'),
+            dcc.RangeSlider(
+                id='year-slider',
+                min=data['year'].min(),
+                max=data['year'].max(),
+                step=1,
+                marks={str(year): str(year) for year in range(data['year'].min(), data['year'].max()+1, 5)},
+                value=[data['year'].min(), data['year'].max()]
+            ),
+            html.Label('Select Plot Type:'),
+            dcc.RadioItems(
+                id='plot_type',
+                options=[
+                    {'label': 'Scatter Plot', 'value':'scatter'},
+                    {'label': 'Bar Plot', 'value': 'bar'},
+                ],
+                value='scatter', 
+                inline=True, 
+                labelStyle={'display': 'inline-block', 'margin-right': '10px'}
+            ),
+            html.H2('Popularity & Danceability'),
+            dcc.Graph(id='popularity-graph'),
+        ], width=12)
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.Label('Select Genre for Previews:'),
+            dcc.Dropdown(
+                id='genre_group-dropdown-preview',
+                options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
+                value=data['genre_group'].unique()[0]
+            ),
+            html.Label('Preview Song from Genre:'),
+            dcc.Dropdown(
+                id='preview-dropdown', 
+                placeholder='Select title...'
+            ),
+            html.Div([
+                html.Iframe(id='audio-player', style={'width': '100%', 'height': '80px', 'border': 'none'})
+            ])
+        ], width=12)
+    ]),
+], fluid=True)
 
 # Callbacks for interactivity
 
