@@ -84,7 +84,20 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 # App layout
 app.layout = dbc.Container([
     dbc.Row([
-        dbc.Col(html.H1('Spotify Dashboard 🎵', className='text-center mb-4'), width=12)
+        dbc.Col(
+            dbc.Alert(
+                [
+                    html.H1("Welcome to the Spotify Dashboard! 🎵", className="alert-heading"),
+                    html.P(
+                        "Explore Spotify's track data: find popular genres, discover relationships between track features, "
+                        "and more. Use the dropdowns and plots to dive deeper!"
+                    )
+                ],
+                color="primary",
+                className="mt-4"
+            ),
+            width=12
+        )
     ]),
     dbc.Row([
         dbc.Col([
