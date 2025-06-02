@@ -122,21 +122,36 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 # App layout
 app.layout = dbc.Container([
     dbc.Row([
-        dbc.Col(
-            dbc.Alert(
-                [
-                    html.H1("Welcome to the Spotify Dashboard! 🎵", className="alert-heading"),
-                    html.P(
-                        "Explore Spotify's track data: find popular genres, discover relationships between track features, "
-                        "and more. Use the dropdowns and plots to dive deeper!"
-                    )
-                ],
-                color="primary",
-                className="mt-4"
+        dbc.Col([
+            html.H1("🎶 Welcome to the Interactive Music Trends Dashboard! 🎶", className="text-center mt-4"),
+            html.P(
+                """
+                This dynamic dashboard explores music listening trends using Spotify data, including audio features 
+                like danceability, energy, tempo, and popularity. Using a publicly available dataset from Kaggle, this 
+                app helps you uncover how these musical characteristics relate to song popularity across genres and time.
+                """,
+                className="text-center fs-5"
             ),
-            width=12
-        )
+            html.P(
+                """
+                On this dashboard, you can:
+                - Explore how different musical features shape the popularity of songs
+                - Analyze trends across various genres
+                - Dive into how musical preferences change over time
+                - Interactively filter data by genre, year, and artist for tailored insights
+                """,
+                className="text-center fs-5"
+            ),
+            html.P(
+                """
+                Whether you’re a data enthusiast, music lover, or just curious about what makes a song popular, 
+                this dashboard provides an engaging way to dig deeper. Let’s dive in and explore the data together!
+                """,
+                className="text-center fs-5"
+            ),
+        ], width=12)
     ]),
+
     dbc.Row([
         dbc.Col([
             html.Label('Select Genre for Style Polar Chart:'),
