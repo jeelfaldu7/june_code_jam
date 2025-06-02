@@ -2,6 +2,7 @@
 import re
 import os
 import random
+import sklearn
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -15,6 +16,10 @@ from dash import Dash, html, dcc, callback, Output, Input, State
 import dash_bootstrap_components as dbc
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+import plotly.express as px
 
 # Load the dataset and read the data correctly
 data = pd.read_csv('datasets/spotify.csv')
@@ -29,6 +34,33 @@ data['length_duration'] = data['length_duration'].str.replace(',', '')
 data['length_duration'] = data['length_duration'].astype(int)
 
 data['genre_group'] = data['top_genre'].copy()
+
+features = [
+    'beats_per_minute_bpm',
+    'energy',
+    'danceability',
+    'loudness_db',
+    'liveness',
+    'valence',
+    'length_duration',
+    'acousticness',
+    'speechiness',
+    'popularity'
+]
+
+X = data[features]
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+k = 5  # or use a dropdown as described
+kmeans = KMeans(n_clusters=k, random_state=42)
+data['cluster'] = kmeans.fit_predict(X_scaled)
+
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)
+
+data['pca1'] = X_pca[:, 0]
+data['pca2'] = X_pca[:, 1]
 
 def make_freq_dict(series):
     #convert pd.Series to concatenated string
@@ -119,6 +151,10 @@ app.layout = dbc.Container([
                 options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
                 value=data['genre_group'].unique()[0]
             ),
+            dbc.Tooltip(
+                "Select a genre to see its popularity trends!",
+                target="genre_group-dropdown-graph" 
+                ),
             html.Label('Select Year Range:'),
             dcc.RangeSlider(
                 id='year-slider',
@@ -159,6 +195,12 @@ app.layout = dbc.Container([
             html.Div([
                 html.Iframe(id='audio-player', style={'width': '100%', 'height': '80px', 'border': 'none'})
             ])
+        ], width=12)
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.H2('K-Means Clusters (PCA Projection)', className='text-center'),
+            dcc.Graph(id='kmeans-cluster-graph')  # ID for this plot
         ], width=12)
     ]),
 ], fluid=True)
@@ -319,10 +361,32 @@ def update_interactive_heatmap(_):
             )
     return fig
 
+@app.callback(
+    Output('kmeans-cluster-graph', 'figure'),
+    Input('genre_group-dropdown-graph', 'value')  # trigger callback to render once
+)
+def update_kmeans_cluster_graph(_):
+    fig = px.scatter(
+        data,
+        x='pca1',
+        y='pca2',
+        color='cluster',
+        hover_data=['title', 'artist', 'top_genre', 'year'],
+        title=f'K-Means Clustering of Songs (k={k})',
+        color_continuous_scale='Viridis'  # Or discrete color sequence
+    )
+    fig.update_layout(
+        height=600,
+        width=900,
+        font=dict(family='Helvetica, Arial, sans-serif', size=14, color='#333')
+    )
+    return fig
+
 app.layout.children.append(
     dbc.Row([
         dbc.Col(html.Footer('© 2025 Jeel Faldu / Project. Data Source: Spotify', className='text-center text-muted py-2'), width=12)
     ])
+
 )
 # Run the app
 if __name__ == '__main__':
