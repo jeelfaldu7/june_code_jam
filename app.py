@@ -90,6 +90,12 @@ data['genre_group'].where(~data['genre_group'].str.contains('soul'), 'soul', inp
 # Compute the correlation matrix
 corr_matrix = data.corr(numeric_only=True)
 
+# Calculating average features per top_genre
+style_features = data.groupby('genre_group').mean(numeric_only=True)[[
+    'beats_per_minute_bpm', 'energy', 'danceability', 'loudness_db',
+    'liveness', 'valence', 'acousticness', 'speechiness', 'popularity'
+]]
+
 CLIENT_ID = ""
 CLIENT_SECRET = ""
 
@@ -130,6 +136,17 @@ app.layout = dbc.Container([
             ),
             width=12
         )
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.Label('Select Genre for Style Polar Chart:'),
+            dcc.Dropdown(
+                id='genre-polar-dropdown',
+                options=[{'label': genre, 'value': genre} for genre in data['top_genre'].unique()],
+                value=data['top_genre'].unique()[0]
+            ),
+            dcc.Graph(id='polar-style-chart')
+        ], width=12)
     ]),
     dbc.Row([
         dbc.Col([
@@ -206,6 +223,36 @@ app.layout = dbc.Container([
 ], fluid=True)
 
 # Callbacks for interactivity
+
+@app.callback(
+    Output('polar-style-chart', 'figure'),
+    Input('genre-polar-dropdown', 'value')
+)
+def update_polar_chart(selected_genre):
+    # Filter data for the selected genre
+    genre_data = data[data['top_genre'] == selected_genre]
+
+    # Compute average features
+    features = genre_data[[
+        'beats_per_minute_bpm', 'energy', 'danceability', 'loudness_db',
+        'liveness', 'valence', 'acousticness', 'speechiness', 'popularity'
+    ]].mean()
+
+    # Prepare data for polar chart
+    categories = features.index.tolist()
+    values = features.tolist()
+
+    fig = px.line_polar(
+        r=values + [values[0]],  # repeat the first value to close the loop
+        theta=categories + [categories[0]],
+        line_close=True,
+        title=f'Style Profile: {selected_genre}',
+        template='plotly_dark'
+    )
+
+    fig.update_traces(fill='toself', line_color='lime')
+    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])))
+    return fig
 
 #callback that updates track preview dropdown when genre is selected
 @app.callback(
@@ -326,6 +373,7 @@ def update_popularity_by_genre(_):
         color_continuous_scale='Blues'
     )
     fig.update_layout(yaxis=dict(autorange="reversed"),
+                      template='ggplot2',
                       font=dict(
                           family='Helvetica, Arial, sans-serif',
                           size=14,
@@ -352,6 +400,7 @@ def update_interactive_heatmap(_):
     fig.update_layout(
             height=800,
             width=1500,
+            template='ggplot2',
             margin=dict(l=50, r=50, t=50, b=50),
             font=dict(
                 family='Helvetica, Arial, sans-serif',
@@ -378,6 +427,7 @@ def update_kmeans_cluster_graph(_):
     fig.update_layout(
         height=600,
         width=900,
+        template='ggplot2',
         font=dict(family='Helvetica, Arial, sans-serif', size=14, color='#333')
     )
     return fig
@@ -388,6 +438,37 @@ app.layout.children.append(
     ])
 
 )
+
+@app.callback(
+    Output('style-output', 'children'),
+    Output('radar-chart', 'figure'),
+    Input('style-dropdown', 'value')
+)
+def update_output(selected_style):
+    selected_row = data[data['style'] == selected_style].iloc[0]
+
+    categories = ['popularity', 'danceability', 'acousticness']
+    values = [selected_row[c] for c in categories]
+
+    # Create the polar bar chart
+    fig = px.bar_polar(
+        r=values,
+        theta=categories,
+        color=categories,
+        color_discrete_sequence=px.colors.sequential.Plasma_r
+    )
+    fig.update_layout(
+        title=f"{selected_style} Style Characteristics",
+        polar_bgcolor='#222',
+        paper_bgcolor='#0e1117',
+        font_color='white'
+    )
+
+    return html.Div([
+        html.H3(f"Selected Style: {selected_style}", style={'color': '#22dd22'}),
+        html.P("Here's a snapshot of this style's characteristics.")
+    ]), fig
+
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True, port=7124)
