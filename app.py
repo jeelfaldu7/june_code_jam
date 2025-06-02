@@ -198,6 +198,21 @@ app.layout = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
+            html.H2('Top 10 Artists by Popularity', className='text-center'),
+            html.Label("Select Artists:", className="fw-bold"),  # Use Bootstrap classes for styling
+            dcc.Graph(
+                id='artist-graph',
+            ),
+            dcc.Dropdown(
+                id='artist-dropdown',
+                options=[{'label': a, 'value': a} for a in sorted(data['artist'].unique())],
+                multi=True,
+                placeholder="Select one or more artists"
+            ),
+        ], width=12)
+    ]),
+    dbc.Row([
+        dbc.Col([
             html.Label('Select Genre for Previews:'),
             dcc.Dropdown(
                 id='genre_group-dropdown-preview',
@@ -440,34 +455,24 @@ app.layout.children.append(
 )
 
 @app.callback(
-    Output('style-output', 'children'),
-    Output('radar-chart', 'figure'),
-    Input('style-dropdown', 'value')
+    Output('artist-graph', 'figure'),
+    Input('artist-dropdown', 'value')
 )
-def update_output(selected_style):
-    selected_row = data[data['style'] == selected_style].iloc[0]
+def update_artist_graph(_):
+    # Filter to selected artists
+    top_artists = data.groupby('artist')['popularity'].mean().sort_values(ascending=False).head(10).reset_index()
 
-    categories = ['popularity', 'danceability', 'acousticness']
-    values = [selected_row[c] for c in categories]
+    fig = px.bar(
+        top_artists,
+        x='artist',
+        y='popularity',
+        color='popularity',
+        title='Artists Popularity',
+        color_continuous_scale='Blues'
 
-    # Create the polar bar chart
-    fig = px.bar_polar(
-        r=values,
-        theta=categories,
-        color=categories,
-        color_discrete_sequence=px.colors.sequential.Plasma_r
     )
-    fig.update_layout(
-        title=f"{selected_style} Style Characteristics",
-        polar_bgcolor='#222',
-        paper_bgcolor='#0e1117',
-        font_color='white'
-    )
-
-    return html.Div([
-        html.H3(f"Selected Style: {selected_style}", style={'color': '#22dd22'}),
-        html.P("Here's a snapshot of this style's characteristics.")
-    ]), fig
+    fig.update_layout(xaxis_tickangle=-45)
+    return fig
 
 # Run the app
 if __name__ == '__main__':
