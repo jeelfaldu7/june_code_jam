@@ -82,6 +82,10 @@ app = Dash()
 # App layout
 app.layout = html.Div([
     html.H1('Spotify Dashboard 🎵', style={'textAlign': 'center'}),
+    html.H2('Interactive Correlation Heatmap'),
+    dcc.Graph(
+        id='heatmap',
+    ),
     html.H2('Popularity by Genre (Top 25 Most Popular)'),
     dcc.Graph(id='popularity-by-genre-graph'),
 
@@ -130,24 +134,6 @@ app.layout = html.Div([
     dcc.Graph(
         id='popularity-graph',
     ),
-
-    html.H2('Interactive Correlation Heatmap'),
-    dcc.Graph(
-        id='heatmap',
-        figure = px.imshow(
-            corr_matrix,
-            x=corr_matrix.columns,
-            y=corr_matrix.columns,
-            color_continuous_scale='RdBu_r',
-            zmin=-1,
-            zmax=1,
-            text_auto=True 
-        ).update_layout(
-            height=800,
-            width=1000,
-            margin=dict(l=50, r=50, t=50, b=50)
-        )
-    )
 ])
 
 # Callbacks for interactivity
@@ -272,7 +258,26 @@ def update_popularity_by_genre(_):
 
     return fig
 
-
+@app.callback(
+    Output('heatmap', 'figure'),
+    Input('genre_group-dropdown', 'value')  # just to trigger once on app load
+)
+def update_interactive_heatmap(_):
+    fig = px.imshow(
+            corr_matrix,
+            x=corr_matrix.columns,
+            y=corr_matrix.columns,
+            color_continuous_scale='RdBu_r',
+            zmin=-1,
+            zmax=1,
+            text_auto=True 
+    )
+    fig.update_layout(
+            height=800,
+            width=1000,
+            margin=dict(l=50, r=50, t=50, b=50)
+            )
+    return fig
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True, port=7124)
