@@ -91,24 +91,10 @@ app.layout = html.Div([
 
     html.Label('Select Genre:'),
     dcc.Dropdown(
-        id='genre_group-dropdown',
+        id='genre_group-dropdown-graph',
         options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
         value=data['genre_group'].unique()[0]
     ),
-    # BONUS: audio preview
-    html.Div([
-        html.Label('Preview Song from Genre:'),
-        dcc.Dropdown(
-            id='preview-dropdown', 
-            placeholder='Select title...'
-        ),
-        html.Div([
-            html.Iframe(
-                id='audio-player'
-            )
-        ])
-           
-    ]),
     html.Label('Select Year Range:'),
     dcc.RangeSlider(
         id='year-slider',
@@ -134,6 +120,27 @@ app.layout = html.Div([
     dcc.Graph(
         id='popularity-graph',
     ),
+
+    html.Label('Select Genre for Previews:'),
+    dcc.Dropdown(
+        id='genre_group-dropdown-preview',
+        options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
+        value=data['genre_group'].unique()[0]
+    ),
+    # BONUS: audio preview
+    html.Div([
+        html.Label('Preview Song from Genre:'),
+        dcc.Dropdown(
+            id='preview-dropdown', 
+            placeholder='Select title...'
+        ),
+        html.Div([
+            html.Iframe(
+                id='audio-player'
+            )
+        ])
+           
+    ]),
 ])
 
 # Callbacks for interactivity
@@ -141,7 +148,7 @@ app.layout = html.Div([
 #callback that updates track preview dropdown when genre is selected
 @app.callback(
     Output('preview-dropdown', 'options'),
-    Input('genre_group-dropdown', 'value'),
+    Input('genre_group-dropdown-preview', 'value'),
 )
 def update_preview_list(selected_genre):
     genre_filter = data[(data['genre_group'] == selected_genre)]
@@ -186,10 +193,10 @@ def get_preview_audio(artist_and_title):
 #callback that updates graph when genre is selected, or when year slider or plot type radio button are used
 @app.callback(
     Output('popularity-graph', 'figure'),
-    Input('preview-dropdown', 'value'),
+    Input('genre_group-dropdown-graph', 'value'),
     Input('year-slider', 'value'), 
     Input('plot_type', 'value')
-)
+    )
 def update_graph(selected_genre, year_range, plot_type):
     filtered_data = data[(data['genre_group'] == selected_genre) &
                       (data['year'] >= year_range[0]) &
@@ -239,7 +246,7 @@ def update_graph(selected_genre, year_range, plot_type):
 
 @app.callback(
     Output('popularity-by-genre-graph', 'figure'),
-    Input('genre_group-dropdown', 'value')  # just to trigger once on app load
+    Input('genre_group-dropdown-graph', 'value')  # just to trigger once on app load
 )
 def update_popularity_by_genre(_):
     pop_genre = data.groupby('genre_group')['popularity'].mean().sort_values(ascending=False).head(25).reset_index()
@@ -260,7 +267,7 @@ def update_popularity_by_genre(_):
 
 @app.callback(
     Output('heatmap', 'figure'),
-    Input('genre_group-dropdown', 'value')  # just to trigger once on app load
+    Input('genre_group-dropdown-graph', 'value')  # just to trigger once on app load
 )
 def update_interactive_heatmap(_):
     fig = px.imshow(
