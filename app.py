@@ -216,8 +216,10 @@ def update_graph(selected_genre, year_range, plot_type):
             x='danceability',
             y='popularity',
             color='energy',
-            title='Popularity versus Danceability',
-            hover_data=['artist', 'title', 'year'],
+            color_continuous_scale='Viridis',
+            labels={'popularity': 'Popularity', 'danceability': 'Danceability', 'energy': 'Energy'},
+            title='Popularity vs Danceability',
+            hover_data={'artist': True, 'title': True, 'year': True, 'popularity': True}
         )
 
     elif plot_type == 'bar':
@@ -229,7 +231,7 @@ def update_graph(selected_genre, year_range, plot_type):
         filtered_data['danceability_bin'] = pd.cut(
             filtered_data['danceability'], 
             bins=bins, 
-            labels=labels, 
+            labels=labels,
             include_lowest=True
         )
 
@@ -268,7 +270,13 @@ def update_popularity_by_genre(_):
         color='popularity',
         color_continuous_scale='Blues'
     )
-    fig.update_layout(yaxis=dict(autorange="reversed"))  # highest popularity on top
+    fig.update_layout(yaxis=dict(autorange="reversed"),
+                      font=dict(
+                          family='Helvetica, Arial, sans-serif',
+                          size=14,
+                          color='#333'
+                        )
+    )  # highest popularity on top
 
     return fig
 
@@ -289,9 +297,20 @@ def update_interactive_heatmap(_):
     fig.update_layout(
             height=800,
             width=1500,
-            margin=dict(l=50, r=50, t=50, b=50)
+            margin=dict(l=50, r=50, t=50, b=50),
+            font=dict(
+                family='Helvetica, Arial, sans-serif',
+                size=14,
+                color='#333'
+                )
             )
     return fig
+
+app.layout.children.append(
+    dbc.Row([
+        dbc.Col(html.Footer('© 2025 Jeel Faldu / Project. Data Source: Spotify', className='text-center text-muted py-2'), width=12)
+    ])
+)
 # Run the app
 if __name__ == '__main__':
     app.run(debug=True, port=7124)
