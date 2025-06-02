@@ -460,12 +460,12 @@ app.layout.children.append(
 )
 def update_artist_graph(_):
     # Filter to selected artists
-    top_artists = data.groupby('artist')['popularity'].mean().sort_values(ascending=False).head(10).reset_index()
+    top_artists = data.groupby('artist')['popularity'].mean().sort_values(ascending=True).head(10).reset_index()
 
     fig = px.bar(
         top_artists,
-        x='artist',
-        y='popularity',
+        x='popularity',
+        y='artist',
         color='popularity',
         title='Artists Popularity',
         orientation='h',
