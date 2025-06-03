@@ -144,7 +144,6 @@ artist_title_values = data.index.to_series()
 genre_group_options = [{'label': genre, 'value': genre} for genre in data['genre_group'].unique()]
 all_label = {'label': 'All Genres', 'value': 'all'}
 genre_group_options.insert(0, all_label)
-print(genre_group_options[0])
 
 # App layout
 app.layout = dbc.Container([
@@ -604,11 +603,14 @@ def update_popularity_by_genre(_):
 
 @app.callback(
     Output('kmeans-cluster-graph', 'figure'),
-    Input('genre_group-dropdown-graph', 'value')  # trigger callback to render once
+    Input('cluster-genre-dropdown', 'value')  # trigger callback to render once
 )
-def update_kmeans_cluster_graph(_):
+def update_kmeans_cluster_graph(genre):
+    data_kmeans = data.copy()
+    if (genre!='all'):
+        data_kmeans = data_kmeans[data_kmeans['genre_group'].isin([genre])]
     fig = px.scatter(
-        data,
+        data_kmeans,
         x='pca1',
         y='pca2',
         color='cluster',
