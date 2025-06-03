@@ -142,6 +142,9 @@ artist_title_values = data.index.to_series()
 # genre_group options
 # this sets up the options for k-means clustering by genre
 genre_group_options = [{'label': genre, 'value': genre} for genre in data['genre_group'].unique()]
+all_label = {'label': 'All Genres', 'value': 'all'}
+genre_group_options.insert(0, all_label)
+print(genre_group_options[0])
 
 # App layout
 app.layout = dbc.Container([
@@ -331,7 +334,7 @@ app.layout = dbc.Container([
                             id='cluster-genre-dropdown',
                             # options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
                             options=genre_group_options,
-                            value=data['genre_group'].unique()[0],
+                            value=genre_group_options[0]['value'],
                             style={
                                 'background-color': '#f8f8f0',   # cream/off-white background
                                 'color': '#1c1c2e',              # text color (dark navy)
