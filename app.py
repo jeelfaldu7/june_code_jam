@@ -134,24 +134,20 @@ app.layout = dbc.Container([
                 like danceability, energy, tempo, and popularity. Using a publicly available dataset from Kaggle, this 
                 app helps you uncover how these musical characteristics relate to song popularity across genres and time.
                 """,
-                className="text-center fs-5", style={"color": "#ffffff"}
+                className="text-start fs-5", style={"color": "#ffffff", "text-indent": '40px'}
             ),
-            html.P(
-                """
-                On this dashboard, you can:
-                - Explore how different musical features shape the popularity of songs
-                - Analyze trends across various genres
-                - Dive into how musical preferences change over time
-                - Interactively filter data by genre, year, and artist for tailored insights
-                """,
-                className="text-center fs-5", style={"color": "#ffffff"}
-            ),
+            html.Ul([
+                html.Li("Explore how different musical features shape the popularity of songs"),
+                html.Li("Analyze trends across various genres"),
+                html.Li("Dive into how musical preferences change over time"),
+                html.Li("Interactively filter data by genre, year, and artist for tailored insights")
+            ], className="text-start fs-5", style={"color": "#ffffff", "text-indent": '20px', "margin-left": "40px"}),
             html.P(
                 """
                 Whether you’re a data enthusiast, music lover, or just curious about what makes a song popular, 
                 this dashboard provides an engaging way to dig deeper. Let’s dive in and explore the data together!
                 """,
-                className="text-center fs-5", style={"color": "#ffffff"}
+                className="text-start fs-5", style={"color": "#ffffff", "text-indent": '40px'}
             ),
         ]),
         style={
