@@ -308,13 +308,13 @@ app.layout = dbc.Container([
             dbc.Row([
                 dbc.Col([
                     html.H2('K-Means Clusters (PCA Projection)', className='text-center',  
-                            style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                            style={'background-color': '#f8f8f0', "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
                 ], width=12),
             ]),
             dbc.Row([
                 dbc.Col([
                     html.P('Investigate tracks that are similar to each other here!', className='text-center',  
-                           style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                           style={'background-color': '#f8f8f0', "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
                 ], width=12),
             ]),
             dbc.Row([
@@ -330,12 +330,26 @@ app.layout = dbc.Container([
                         dcc.Dropdown(
                             id='cluster-dropdown',
                             options=[{'label': i[0], 'value': i[1]} for i in zip(artist_title_labels, artist_title_values)],
-                            placeholder="Select a track"
+                            placeholder="Select a track", 
+                            style={
+                                'background-color': '#f8f8f0',   # cream/off-white background
+                                'color': '#1c1c2e',              # text color (dark navy)
+                                'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                                'border-radius': '4px',          # slight border rounding
+                                'padding': '5px'                 # optional padding
+                }
                         ),
                     ]),
                     dbc.Row([
                         dbc.Table(
-                            id='cluster-table', 
+                            id='cluster-table',
+                            style={
+                                'background-color': '#f8f8f0',   # cream/off-white background
+                                'color': '#1c1c2e',              # text color (dark navy)
+                                'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                                'border-radius': '4px',          # slight border rounding
+                                'padding': '5px'                 # optional padding
+                } 
                         )
                     ])
                 ]),
