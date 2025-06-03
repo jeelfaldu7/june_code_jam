@@ -253,7 +253,10 @@ app.layout = dbc.Container([
             dcc.Graph(id='kmeans-cluster-graph')  # ID for this plot
         ], width=12)
     ]),
-], fluid=True)
+], 
+    fluid=True,
+    style={"background-color": "#f8f8f0", "min-height": "100vh", "padding": "20px"}
+)
 
 # Callbacks for interactivity
 
