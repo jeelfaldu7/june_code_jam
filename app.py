@@ -16,7 +16,9 @@ from dash import Dash, html, dcc, callback, Output, Input, State
 import dash_bootstrap_components as dbc
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+from scipy.spatial.distance import cdist
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import MaxAbsScaler
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import plotly.express as px
@@ -118,6 +120,11 @@ sp = spotipy.Spotify(auth_manager=auth_manager, client_credentials_manager=auth_
 
 app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY]) 
 
+# labels
+# these are for any instance where we must display "Artist - Title", such as in dropdowns
+artist_title_labels = data['artist'] + " - " + data['title']
+artist_title_values = data.index.to_series()
+
 
 # App layout
 app.layout = dbc.Container([
@@ -157,7 +164,7 @@ app.layout = dbc.Container([
             "padding": "20px",
         },
     )
-], width=12)
+], id="title-card", width=12)
 
     ]),
 
@@ -247,12 +254,48 @@ app.layout = dbc.Container([
             ])
         ], width=12)
     ]),
-    dbc.Row([
-        dbc.Col([
-            html.H2('K-Means Clusters (PCA Projection)', className='text-center'),
-            dcc.Graph(id='kmeans-cluster-graph')  # ID for this plot
-        ], width=12)
-    ]),
+    dbc.Table(
+        #header
+        [html.Thead()] + 
+        [html.Tbody([
+            dbc.Row([
+                dbc.Col([
+                    html.H2('K-Means Clusters (PCA Projection)', className='text-center',  
+                            style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                ], width=12),
+            ]),
+            dbc.Row([
+                dbc.Col([
+                    html.P('Investigate tracks that are similar to each other here!', className='text-center',  
+                           style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                ], width=12),
+            ]),
+            dbc.Row([
+                dbc.Col(
+                    dcc.Graph(id='kmeans-cluster-graph')  # ID for this plot
+                ),
+                dbc.Col([
+                    dbc.Row([
+                        html.H5('Choose a track:', className='text-center',  
+                        style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                    ]),
+                    dbc.Row([
+                        dcc.Dropdown(
+                            id='cluster-dropdown',
+                            options=[{'label': i[0], 'value': i[1]} for i in zip(artist_title_labels, artist_title_values)],
+                            placeholder="Select a track"
+                        ),
+                    ]),
+                    dbc.Row([
+                        dbc.Table(
+                            id='cluster-table', 
+                        )
+                    ])
+                ]),
+            ]),
+        ])],
+        id='k-means-display-area'
+    ),
 ], 
     fluid=True,
     style={"background-color": "#f8f8f0", "min-height": "100vh", "padding": "20px"}
@@ -297,14 +340,8 @@ def update_polar_chart(selected_genre):
 )
 def update_preview_list(selected_genre):
     genre_filter = data[(data['genre_group'] == selected_genre)]
-    titles = genre_filter['title']
-    artists = genre_filter['artist']
     labels = genre_filter['artist'] + " - " + genre_filter['title']
 
-    #TODO values may need changed depending on the needs of Spotify's API
-    #so "values = labels" here is a placeholder until those needs are determined
-    #values = labels
-    #results = [{'label': i, 'value': j} for i,j in zip(labels, values)]
     results = [{'label': i, 'value': i} for i in labels]
     return results
 
@@ -334,6 +371,84 @@ def get_preview_audio(artist_and_title):
     src = "https://open.spotify.com/embed/track/" + track_id + "?utm_source=generator"
     print("src:", src)
     return src
+
+
+#callback that finds nearest neighbors of the track from the cluster-dropdown
+@app.callback(     
+    Output('cluster-table', 'children'),
+    Input('cluster-dropdown', 'value'),
+    prevent_initial_call=True
+)
+def get_track_nn(track_index):
+
+    #number of results to display
+    k = 10
+
+    #list of quantitative columns
+    numeric =['year', 'beats_per_minute_bpm', 'energy', 'danceability', 'loudness_db', 
+              'liveness', 'valence', 'length_duration', 'acousticness', 'speechiness', 'popularity']
+    
+    #create dataframe for results
+    #this copy operation is probably performance-expensive; move elsewhere if needed
+    nn_results = data.copy()
+
+    #scale nn_results to ensure numeric features are equally represented
+    mas_scaler = MaxAbsScaler()
+    mas_scaler.fit(nn_results[numeric].to_numpy())
+    nn_results.loc[:, numeric] = mas_scaler.transform(nn_results[numeric].to_numpy())
+   
+    #calculate distances between observation 'track_index' and all other points
+    distances = cdist(nn_results[numeric], [nn_results[numeric].iloc[track_index]], metric='euclidean')
+
+    nn_results['distance'] = pd.Series(distances[:, 0])
+
+    #sort nn_results by distance
+    nn_results.sort_values(by='distance', axis=0, inplace=True, ascending=True)
+    nn_results = nn_results.iloc[1:k+1]
+    nn_results.reset_index(drop=True, inplace=True)
+
+    #generate children of the cluster-table component
+    table_contents = [
+        dbc.Row([
+            html.H6('Tracks with similar metrics:', className='text-center',  
+                style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+        ]),
+        dbc.Row([
+            dbc.Col([
+                html.P('Artist', className='text-center',  
+                    style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+            ]),
+            dbc.Col([
+                html.P('Title', className='text-center',  
+                    style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+            ]),
+            dbc.Col([
+                html.P('Distance', className='text-center',  
+                    style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+            ]),
+        ]),
+    ]
+
+    #append data to table_contents
+    for i in range(0, k):
+        table_contents.append(
+            dbc.Row([
+                dbc.Col([
+                    html.P(nn_results.iloc[i]['artist'], className='text-center',  
+                        style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                ]),
+                dbc.Col([
+                    html.P(nn_results.iloc[i]['title'], className='text-center',  
+                        style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                ]),dbc.Col([
+                    html.P(nn_results.iloc[i]['distance'], className='text-center',  
+                        style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                ]),
+            ])
+        )
+
+    return table_contents
+
 
 #callback that updates graph when genre is selected, or when year slider or plot type radio button are used
 @app.callback(
