@@ -167,7 +167,14 @@ app.layout = dbc.Container([
             dcc.Dropdown(
                 id='genre-polar-dropdown',
                 options=[{'label': genre, 'value': genre} for genre in data['top_genre'].unique()],
-                value=data['top_genre'].unique()[0]
+                value=data['top_genre'].unique()[0],
+                style={
+                    'background-color': '#f8f8f0',   # cream/off-white background
+                    'color': '#1c1c2e',              # text color (dark navy)
+                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                    'border-radius': '4px',          # slight border rounding
+                    'padding': '5px'                 # optional padding
+                }
             ),
             dcc.Graph(id='polar-style-chart')
         ], width=12)
@@ -184,12 +191,26 @@ app.layout = dbc.Container([
             dcc.Dropdown(
                 id='genre_group-dropdown-graph',
                 options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
-                value=data['genre_group'].unique()[0]
+                value=data['genre_group'].unique()[0],
+                style={
+                    'background-color': '#f8f8f0',   # cream/off-white background
+                    'color': '#1c1c2e',              # text color (dark navy)
+                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                    'border-radius': '4px',          # slight border rounding
+                    'padding': '5px'                 # optional padding
+                }
             ),
             dbc.Tooltip(
                 "Select a genre to see its popularity trends!",
-                target="genre_group-dropdown-graph" 
-                ),
+                target="genre_group-dropdown-graph" ,
+                style={
+                    'background-color': '#f8f8f0',   # cream/off-white background
+                    'color': '#1c1c2e',              # text color (dark navy)
+                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                    'border-radius': '4px',          # slight border rounding
+                    'padding': '5px'                 # optional padding
+                }
+            ),
             html.Label('Select Year Range:'),
             dcc.RangeSlider(
                 id='year-slider',
@@ -197,7 +218,7 @@ app.layout = dbc.Container([
                 max=data['year'].max(),
                 step=1,
                 marks={str(year): str(year) for year in range(data['year'].min(), data['year'].max()+1, 5)},
-                value=[data['year'].min(), data['year'].max()]
+                value=[data['year'].min(), data['year'].max()],
             ),
 
             html.H2('Popularity & Danceability', className='text-center'),
@@ -215,7 +236,14 @@ app.layout = dbc.Container([
                 id='artist-dropdown',
                 options=[{'label': a, 'value': a} for a in sorted(data['artist'].unique())],
                 multi=True,
-                placeholder="Select one or more artists"
+                placeholder="Select one or more artists",
+                style={
+                    'background-color': '#f8f8f0',   # cream/off-white background
+                    'color': '#1c1c2e',              # text color (dark navy)
+                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                    'border-radius': '4px',          # slight border rounding
+                    'padding': '5px'                 # optional padding
+                }
             ),
         ], width=12)
     ]),
@@ -225,12 +253,27 @@ app.layout = dbc.Container([
             dcc.Dropdown(
                 id='genre_group-dropdown-preview',
                 options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
-                value=data['genre_group'].unique()[0]
+                value=data['genre_group'].unique()[0],
+                style={
+                    'background-color': '#f8f8f0',   # cream/off-white background
+                    'color': '#1c1c2e',              # text color (dark navy)
+                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                    'border-radius': '4px',          # slight border rounding
+                    'padding': '5px'                 # optional padding
+                }
             ),
+
             html.Label('Preview Song from Genre:'),
             dcc.Dropdown(
                 id='preview-dropdown', 
-                placeholder='Select title...'
+                placeholder='Select title...',
+                style={
+                    'background-color': '#f8f8f0',   # cream/off-white background
+                    'color': '#1c1c2e',              # text color (dark navy)
+                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                    'border-radius': '4px',          # slight border rounding
+                    'padding': '5px'                 # optional padding
+                }
             ),
             html.Div([
                 html.Iframe(id='audio-player', style={'width': '100%', 'height': '80px', 'border': 'none'})
@@ -371,7 +414,7 @@ def update_popularity_by_genre(_):
         title='Popularity by Genre (Top 25 Most Popular)',
         labels={'popularity': 'Average Popularity', 'genre_group': 'Genres'},
         color='popularity',
-        color_continuous_scale='Blues'
+        color_continuous_scale='Viridis'
     )
     fig.update_layout(yaxis=dict(autorange="reversed"),
                       template='ggplot2',
@@ -431,10 +474,11 @@ def update_artist_graph(_):
         color='popularity',
         title='Artists Popularity',
         orientation='h',
-        color_continuous_scale='Blues'
+        color_continuous_scale='Viridis'
 
     )
-    fig.update_layout(xaxis_tickangle=-45,
+    fig.update_layout(yaxis=dict(autorange="reversed"),
+                      xaxis_tickangle=-45,
                       paper_bgcolor='#f8f8f0',  
                       plot_bgcolor="#f8f8f0")
     return fig
