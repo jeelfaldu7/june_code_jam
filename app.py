@@ -138,7 +138,7 @@ app.layout = dbc.Container([
             html.P(
                 """
                 This dynamic dashboard explores music listening trends using Spotify data, including audio features 
-                like danceability, energy, tempo, and popularity. Using a publicly available dataset from Kaggle, this 
+                like danceability, energy, loudness, and popularity. Using a publicly available dataset from Kaggle, this 
                 app helps you uncover how these musical characteristics relate to song popularity across genres and time.
                 """,
                 className="text-start fs-5", style={"color": "#ffffff", "text-indent": '40px'}
@@ -174,14 +174,21 @@ app.layout = dbc.Container([
             dcc.Dropdown(
                 id='genre-polar-dropdown',
                 options=[{'label': genre, 'value': genre} for genre in data['top_genre'].unique()],
-                value=data['top_genre'].unique()[0]
+                value=data['top_genre'].unique()[0],
+                style={
+                    'background-color': '#f8f8f0',   # cream/off-white background
+                    'color': '#1c1c2e',              # text color (dark navy)
+                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                    'border-radius': '4px',          # slight border rounding
+                    'padding': '5px'                 # optional padding
+                }
             ),
             dcc.Graph(id='polar-style-chart')
         ], width=12)
     ]),
     dbc.Row([
         dbc.Col([
-            html.H2('Popularity by Genre (Top 25 Most Popular)', className='text-center'),
+            html.H2('Popularity by Genre (Top 10 Most Popular)', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             dcc.Graph(id='popularity-by-genre-graph'),
         ], width=12)
     ]),
@@ -191,12 +198,26 @@ app.layout = dbc.Container([
             dcc.Dropdown(
                 id='genre_group-dropdown-graph',
                 options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
-                value=data['genre_group'].unique()[0]
+                value=data['genre_group'].unique()[0],
+                style={
+                    'background-color': '#f8f8f0',   # cream/off-white background
+                    'color': '#1c1c2e',              # text color (dark navy)
+                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                    'border-radius': '4px',          # slight border rounding
+                    'padding': '5px'                 # optional padding
+                }
             ),
             dbc.Tooltip(
                 "Select a genre to see its popularity trends!",
-                target="genre_group-dropdown-graph" 
-                ),
+                target="genre_group-dropdown-graph" ,
+                style={
+                    'background-color': '#f8f8f0',   # cream/off-white background
+                    'color': '#1c1c2e',              # text color (dark navy)
+                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                    'border-radius': '4px',          # slight border rounding
+                    'padding': '5px'                 # optional padding
+                }
+            ),
             html.Label('Select Year Range:'),
             dcc.RangeSlider(
                 id='year-slider',
@@ -204,26 +225,16 @@ app.layout = dbc.Container([
                 max=data['year'].max(),
                 step=1,
                 marks={str(year): str(year) for year in range(data['year'].min(), data['year'].max()+1, 5)},
-                value=[data['year'].min(), data['year'].max()]
+                value=[data['year'].min(), data['year'].max()],
             ),
-            html.Label('Select Plot Type:'),
-            dcc.RadioItems(
-                id='plot_type',
-                options=[
-                    {'label': 'Scatter Plot', 'value':'scatter'},
-                    {'label': 'Bar Plot', 'value': 'bar'},
-                ],
-                value='scatter', 
-                inline=True, 
-                labelStyle={'display': 'inline-block', 'margin-right': '10px'}
-            ),
-            html.H2('Popularity & Danceability', className='text-center'),
+
+            html.H2('Popularity & Danceability', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             dcc.Graph(id='popularity-graph'),
         ], width=12)
     ]),
     dbc.Row([
         dbc.Col([
-            html.H2('Top 10 Artists by Popularity', className='text-center'),
+            html.H2('Top 10 Artists by Popularity', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             html.Label("Select Artists:", className="fw-bold"),  # Use Bootstrap classes for styling
             dcc.Graph(
                 id='artist-graph',
@@ -232,7 +243,14 @@ app.layout = dbc.Container([
                 id='artist-dropdown',
                 options=[{'label': a, 'value': a} for a in sorted(data['artist'].unique())],
                 multi=True,
-                placeholder="Select one or more artists"
+                placeholder="Select one or more artists",
+                style={
+                    'background-color': '#f8f8f0',   # cream/off-white background
+                    'color': '#1c1c2e',              # text color (dark navy)
+                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                    'border-radius': '4px',          # slight border rounding
+                    'padding': '5px'                 # optional padding
+                }
             ),
         ], width=12)
     ]),
@@ -242,12 +260,27 @@ app.layout = dbc.Container([
             dcc.Dropdown(
                 id='genre_group-dropdown-preview',
                 options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
-                value=data['genre_group'].unique()[0]
+                value=data['genre_group'].unique()[0],
+                style={
+                    'background-color': '#f8f8f0',   # cream/off-white background
+                    'color': '#1c1c2e',              # text color (dark navy)
+                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                    'border-radius': '4px',          # slight border rounding
+                    'padding': '5px'                 # optional padding
+                }
             ),
+
             html.Label('Preview Song from Genre:'),
             dcc.Dropdown(
                 id='preview-dropdown', 
-                placeholder='Select title...'
+                placeholder='Select title...',
+                style={
+                    'background-color': '#f8f8f0',   # cream/off-white background
+                    'color': '#1c1c2e',              # text color (dark navy)
+                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                    'border-radius': '4px',          # slight border rounding
+                    'padding': '5px'                 # optional padding
+                }
             ),
             html.Div([
                 html.Iframe(id='audio-player', style={'width': '100%', 'height': '80px', 'border': 'none'})
@@ -326,11 +359,14 @@ def update_polar_chart(selected_genre):
         theta=categories + [categories[0]],
         line_close=True,
         title=f'Style Profile: {selected_genre}',
-        template='plotly_white'
+        template='plotly_white',
     )
 
     fig.update_traces(fill='toself', line_color='lime')
-    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])))
+    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
+                      paper_bgcolor='#f8f8f0',  
+                      plot_bgcolor="#f8f8f0"
+                      )
     return fig
 
 #callback that updates track preview dropdown when genre is selected
@@ -454,56 +490,31 @@ def get_track_nn(track_index):
 @app.callback(
     Output('popularity-graph', 'figure'),
     Input('genre_group-dropdown-graph', 'value'),
-    Input('year-slider', 'value'), 
-    Input('plot_type', 'value')
+    Input('year-slider', 'value')
     )
-def update_graph(selected_genre, year_range, plot_type):
+def update_graph(selected_genre, year_range,):
     filtered_data = data[(data['genre_group'] == selected_genre) &
                       (data['year'] >= year_range[0]) &
                       (data['year'] <= year_range[1])]
     
-    # Plot logic depending on the selected plot type
-    if plot_type == 'scatter':
-        fig = px.scatter(
-            filtered_data,
-            x='danceability',
-            y='popularity',
-            color='energy',
-            color_continuous_scale='Viridis',
-            labels={'popularity': 'Popularity', 'danceability': 'Danceability', 'energy': 'Energy'},
-            title='Popularity vs Danceability',
-            hover_data={'artist': True, 'title': True, 'year': True, 'popularity': True}
-        )
+    fig = px.scatter(
+        filtered_data,
+        x='danceability',
+        y='popularity',
+        color='energy',
+        color_continuous_scale='Viridis',
+        labels={'popularity': 'Popularity', 'danceability': 'Danceability', 'energy': 'Energy'},
+        title='Popularity vs Danceability',
+        hover_data={'artist': True, 'title': True, 'year': True, 'popularity': True},
+    )
 
-    elif plot_type == 'bar':
-        filtered_data = filtered_data.copy()
-        bins = [10,40,70,100]
-        labels = ['Low', 'Medium', 'High']
-
-        # Create the bin column
-        filtered_data['danceability_bin'] = pd.cut(
-            filtered_data['danceability'], 
-            bins=bins, 
-            labels=labels,
-            include_lowest=True
-        )
-
-        # Group by danceability_bin and calculate average popularity
-        danceability_summary = (
-            filtered_data.groupby('danceability_bin')['popularity']
-            .mean()
-            .reset_index()
-        )
+    fig.update_layout(
+        template='ggplot2',
+        font=dict(family='Helvetica, Arial, sans-serif', size=14, color='#333'),
+        paper_bgcolor='#f8f8f0',
+        plot_bgcolor="#f8f8f0"
+    )
     
-        # Create a bar plot of average popularity for each danceability bin
-        fig = px.bar(
-            danceability_summary,
-            x='danceability_bin',
-            y='popularity',
-            color='danceability_bin',
-            title='Average Popularity by Danceability Bin'
-        )
-
     return fig
 
 @app.callback(
@@ -511,25 +522,26 @@ def update_graph(selected_genre, year_range, plot_type):
     Input('genre_group-dropdown-graph', 'value')  # just to trigger once on app load
 )
 def update_popularity_by_genre(_):
-    pop_genre = data.groupby('genre_group')['popularity'].mean().sort_values(ascending=False).head(25).reset_index()
+    pop_genre = data.groupby('genre_group')['popularity'].mean().sort_values(ascending=False).head(10).reset_index()
 
     fig = px.bar(
         pop_genre,
         x='popularity',
         y='genre_group',
         orientation='h',
-        title='Popularity by Genre (Top 25 Most Popular)',
+        title='Popularity by Genre (Top 10 Most Popular)',
         labels={'popularity': 'Average Popularity', 'genre_group': 'Genres'},
         color='popularity',
-        color_continuous_scale='Blues'
+        color_continuous_scale='Viridis'
     )
     fig.update_layout(yaxis=dict(autorange="reversed"),
                       template='ggplot2',
+                      paper_bgcolor='#f8f8f0', 
+                      plot_bgcolor="#f8f8f0",
                       font=dict(
                           family='Helvetica, Arial, sans-serif',
                           size=14,
-                          color='#333'
-                        )
+                          color='#333'),
     )  # highest popularity on top
 
     return fig
@@ -545,6 +557,7 @@ def update_kmeans_cluster_graph(_):
         y='pca2',
         color='cluster',
         hover_data=['title', 'artist', 'top_genre', 'year'],
+        labels={'pca1': 'PCA1', 'pca2': 'PCA2', 'cluster':'Cluster'},
         title=f'K-Means Clustering of Songs (k={k})',
         color_continuous_scale='Viridis'  # Or discrete color sequence
     )
@@ -552,7 +565,9 @@ def update_kmeans_cluster_graph(_):
         height=600,
         width=900,
         template='ggplot2',
-        font=dict(family='Helvetica, Arial, sans-serif', size=14, color='#333')
+        font=dict(family='Helvetica, Arial, sans-serif', size=14, color='#333'),
+        paper_bgcolor='#f8f8f0',
+        plot_bgcolor="#f8f8f0"
     )
     return fig
 
@@ -578,10 +593,13 @@ def update_artist_graph(_):
         color='popularity',
         title='Artists Popularity',
         orientation='h',
-        color_continuous_scale='Blues'
+        color_continuous_scale='Viridis',
+        labels={'popularity': 'Popularity', 'artist': 'Artists'}
 
     )
-    fig.update_layout(xaxis_tickangle=-45)
+    fig.update_layout(yaxis=dict(autorange="reversed"),
+                      paper_bgcolor='#f8f8f0',  
+                      plot_bgcolor="#f8f8f0")
     return fig
 
 # Run the app
