@@ -318,9 +318,29 @@ app.layout = dbc.Container([
                 ], width=12),
             ]),
             dbc.Row([
-                dbc.Col(
-                    dcc.Graph(id='kmeans-cluster-graph')  # ID for this plot
-                ),
+                dbc.Col([
+                    dbc.Row([
+                        html.H5('Choose a genre:', className='text-center',  
+                        style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                    ]),
+                    dbc.Row([
+                        dcc.Dropdown(
+                            id='cluster-dropdown',
+                            options=[{'label': i[0], 'value': i[1]} for i in zip(artist_title_labels, artist_title_values)],
+                            placeholder="Select a track", 
+                            style={
+                                'background-color': '#f8f8f0',   # cream/off-white background
+                                'color': '#1c1c2e',              # text color (dark navy)
+                                'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                                'border-radius': '4px',          # slight border rounding
+                                'padding': '5px'                 # optional padding
+                            }
+                        )
+                    ]),
+                    dbc.Row([
+                        dcc.Graph(id='kmeans-cluster-graph')  # ID for this plot
+                    ]),
+                ]),
                 dbc.Col([
                     dbc.Row([
                         html.H5('Choose a track:', className='text-center',  
