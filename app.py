@@ -199,17 +199,7 @@ app.layout = dbc.Container([
                 marks={str(year): str(year) for year in range(data['year'].min(), data['year'].max()+1, 5)},
                 value=[data['year'].min(), data['year'].max()]
             ),
-            html.Label('Select Plot Type:'),
-            dcc.RadioItems(
-                id='plot_type',
-                options=[
-                    {'label': 'Scatter Plot', 'value':'scatter'},
-                    {'label': 'Bar Plot', 'value': 'bar'},
-                ],
-                value='scatter', 
-                inline=True, 
-                labelStyle={'display': 'inline-block', 'margin-right': '10px'}
-            ),
+
             html.H2('Popularity & Danceability', className='text-center'),
             dcc.Graph(id='popularity-graph'),
         ], width=12)
@@ -287,7 +277,7 @@ def update_polar_chart(selected_genre):
     )
 
     fig.update_traces(fill='toself', line_color='lime')
-    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])))
+    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), paper_bgcolor='#f8f8f0',  plot_bgcolor="#f8f8f0")
     return fig
 
 #callback that updates track preview dropdown when genre is selected
@@ -339,56 +329,31 @@ def get_preview_audio(artist_and_title):
 @app.callback(
     Output('popularity-graph', 'figure'),
     Input('genre_group-dropdown-graph', 'value'),
-    Input('year-slider', 'value'), 
-    Input('plot_type', 'value')
+    Input('year-slider', 'value')
     )
-def update_graph(selected_genre, year_range, plot_type):
+def update_graph(selected_genre, year_range,):
     filtered_data = data[(data['genre_group'] == selected_genre) &
                       (data['year'] >= year_range[0]) &
                       (data['year'] <= year_range[1])]
     
-    # Plot logic depending on the selected plot type
-    if plot_type == 'scatter':
-        fig = px.scatter(
-            filtered_data,
-            x='danceability',
-            y='popularity',
-            color='energy',
-            color_continuous_scale='Viridis',
-            labels={'popularity': 'Popularity', 'danceability': 'Danceability', 'energy': 'Energy'},
-            title='Popularity vs Danceability',
-            hover_data={'artist': True, 'title': True, 'year': True, 'popularity': True}
-        )
+    fig = px.scatter(
+        filtered_data,
+        x='danceability',
+        y='popularity',
+        color='energy',
+        color_continuous_scale='Viridis',
+        labels={'popularity': 'Popularity', 'danceability': 'Danceability', 'energy': 'Energy'},
+        title='Popularity vs Danceability',
+        hover_data={'artist': True, 'title': True, 'year': True, 'popularity': True},
+    )
 
-    elif plot_type == 'bar':
-        filtered_data = filtered_data.copy()
-        bins = [10,40,70,100]
-        labels = ['Low', 'Medium', 'High']
-
-        # Create the bin column
-        filtered_data['danceability_bin'] = pd.cut(
-            filtered_data['danceability'], 
-            bins=bins, 
-            labels=labels,
-            include_lowest=True
-        )
-
-        # Group by danceability_bin and calculate average popularity
-        danceability_summary = (
-            filtered_data.groupby('danceability_bin')['popularity']
-            .mean()
-            .reset_index()
-        )
+    fig.update_layout(
+        template='ggplot2',
+        font=dict(family='Helvetica, Arial, sans-serif', size=14, color='#333'),
+        paper_bgcolor='#f8f8f0',
+        plot_bgcolor="#f8f8f0"
+    )
     
-        # Create a bar plot of average popularity for each danceability bin
-        fig = px.bar(
-            danceability_summary,
-            x='danceability_bin',
-            y='popularity',
-            color='danceability_bin',
-            title='Average Popularity by Danceability Bin'
-        )
-
     return fig
 
 @app.callback(
@@ -410,11 +375,12 @@ def update_popularity_by_genre(_):
     )
     fig.update_layout(yaxis=dict(autorange="reversed"),
                       template='ggplot2',
+                      paper_bgcolor='#f8f8f0', 
+                      plot_bgcolor="#f8f8f0",
                       font=dict(
                           family='Helvetica, Arial, sans-serif',
                           size=14,
-                          color='#333'
-                        )
+                          color='#333'),
     )  # highest popularity on top
 
     return fig
@@ -437,7 +403,9 @@ def update_kmeans_cluster_graph(_):
         height=600,
         width=900,
         template='ggplot2',
-        font=dict(family='Helvetica, Arial, sans-serif', size=14, color='#333')
+        font=dict(family='Helvetica, Arial, sans-serif', size=14, color='#333'),
+        paper_bgcolor='#f8f8f0',
+        plot_bgcolor="#f8f8f0"
     )
     return fig
 
@@ -466,7 +434,9 @@ def update_artist_graph(_):
         color_continuous_scale='Blues'
 
     )
-    fig.update_layout(xaxis_tickangle=-45)
+    fig.update_layout(xaxis_tickangle=-45,
+                      paper_bgcolor='#f8f8f0',  
+                      plot_bgcolor="#f8f8f0")
     return fig
 
 # Run the app
