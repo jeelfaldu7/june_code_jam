@@ -181,7 +181,7 @@ app.layout = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
-            html.H2('Popularity by Genre (Top 25 Most Popular)', className='text-center'),
+            html.H2('Popularity by Genre (Top 25 Most Popular)', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             dcc.Graph(id='popularity-by-genre-graph'),
         ], width=12)
     ]),
@@ -221,13 +221,13 @@ app.layout = dbc.Container([
                 value=[data['year'].min(), data['year'].max()],
             ),
 
-            html.H2('Popularity & Danceability', className='text-center'),
+            html.H2('Popularity & Danceability', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             dcc.Graph(id='popularity-graph'),
         ], width=12)
     ]),
     dbc.Row([
         dbc.Col([
-            html.H2('Top 10 Artists by Popularity', className='text-center'),
+            html.H2('Top 10 Artists by Popularity', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             html.Label("Select Artists:", className="fw-bold"),  # Use Bootstrap classes for styling
             dcc.Graph(
                 id='artist-graph',
@@ -282,7 +282,7 @@ app.layout = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
-            html.H2('K-Means Clusters (PCA Projection)', className='text-center'),
+            html.H2('K-Means Clusters (PCA Projection)', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             dcc.Graph(id='kmeans-cluster-graph')  # ID for this plot
         ], width=12)
     ]),
@@ -316,11 +316,14 @@ def update_polar_chart(selected_genre):
         theta=categories + [categories[0]],
         line_close=True,
         title=f'Style Profile: {selected_genre}',
-        template='plotly_white'
+        template='plotly_white',
     )
 
     fig.update_traces(fill='toself', line_color='lime')
-    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])), paper_bgcolor='#f8f8f0',  plot_bgcolor="#f8f8f0")
+    fig.update_layout(polar=dict(radialaxis=dict(visible=True, range=[0, 100])),
+                      paper_bgcolor='#f8f8f0',  
+                      plot_bgcolor="#f8f8f0"
+                      )
     return fig
 
 #callback that updates track preview dropdown when genre is selected
@@ -439,6 +442,7 @@ def update_kmeans_cluster_graph(_):
         y='pca2',
         color='cluster',
         hover_data=['title', 'artist', 'top_genre', 'year'],
+        labels={'pca1': 'PCA1', 'pca2': 'PCA2', 'cluster':'Cluster'},
         title=f'K-Means Clustering of Songs (k={k})',
         color_continuous_scale='Viridis'  # Or discrete color sequence
     )
@@ -474,7 +478,8 @@ def update_artist_graph(_):
         color='popularity',
         title='Artists Popularity',
         orientation='h',
-        color_continuous_scale='Viridis'
+        color_continuous_scale='Viridis',
+        labels={'popularity': 'Popularity', 'artist': 'Artists'}
 
     )
     fig.update_layout(yaxis=dict(autorange="reversed"),
