@@ -178,12 +178,6 @@ app.layout = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
-            html.H2('Interactive Correlation Heatmap', className='text-center'),
-            dcc.Graph(id='heatmap'),
-        ], width=12)
-    ]),
-    dbc.Row([
-        dbc.Col([
             html.H2('Popularity by Genre (Top 25 Most Popular)', className='text-center'),
             dcc.Graph(id='popularity-by-genre-graph'),
         ], width=12)
@@ -427,33 +421,6 @@ def update_popularity_by_genre(_):
     return fig
 
 @app.callback(
-    Output('heatmap', 'figure'),
-    Input('genre_group-dropdown-graph', 'value')  # just to trigger once on app load
-)
-def update_interactive_heatmap(_):
-    fig = px.imshow(
-            corr_matrix,
-            x=corr_matrix.columns,
-            y=corr_matrix.columns,
-            color_continuous_scale='RdBu_r',
-            zmin=-1,
-            zmax=1,
-            text_auto=True 
-    )
-    fig.update_layout(
-            height=800,
-            width=1500,
-            template='ggplot2',
-            margin=dict(l=50, r=50, t=50, b=50),
-            font=dict(
-                family='Helvetica, Arial, sans-serif',
-                size=14,
-                color='#333'
-                )
-            )
-    return fig
-
-@app.callback(
     Output('kmeans-cluster-graph', 'figure'),
     Input('genre_group-dropdown-graph', 'value')  # trigger callback to render once
 )
@@ -488,7 +455,7 @@ app.layout.children.append(
 )
 def update_artist_graph(_):
     # Filter to selected artists
-    top_artists = data.groupby('artist')['popularity'].mean().sort_values(ascending=True).head(10).reset_index()
+    top_artists = data.groupby('artist')['popularity'].mean().sort_values(ascending=False).head(10).reset_index()
 
     fig = px.bar(
         top_artists,
