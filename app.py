@@ -483,7 +483,6 @@ def update_artist_graph(_):
 
     )
     fig.update_layout(yaxis=dict(autorange="reversed"),
-                      xaxis_tickangle=-45,
                       paper_bgcolor='#f8f8f0',  
                       plot_bgcolor="#f8f8f0")
     return fig
