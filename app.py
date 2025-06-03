@@ -123,14 +123,18 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 app.layout = dbc.Container([
     dbc.Row([
         dbc.Col([
-            html.H1("🎶 Welcome to the Interactive Music Trends Dashboard! 🎶", className="text-center mt-4"),
+    dbc.Card(
+        dbc.CardBody([
+            html.H1("🎶 Welcome to the Interactive Music Trends Dashboard! 🎶", 
+                className="text-center mt-4", 
+                style={"color": "#2dd4bf"}),
             html.P(
                 """
                 This dynamic dashboard explores music listening trends using Spotify data, including audio features 
                 like danceability, energy, tempo, and popularity. Using a publicly available dataset from Kaggle, this 
                 app helps you uncover how these musical characteristics relate to song popularity across genres and time.
                 """,
-                className="text-center fs-5"
+                className="text-center fs-5", style={"color": "#ffffff"}
             ),
             html.P(
                 """
@@ -140,16 +144,25 @@ app.layout = dbc.Container([
                 - Dive into how musical preferences change over time
                 - Interactively filter data by genre, year, and artist for tailored insights
                 """,
-                className="text-center fs-5"
+                className="text-center fs-5", style={"color": "#ffffff"}
             ),
             html.P(
                 """
                 Whether you’re a data enthusiast, music lover, or just curious about what makes a song popular, 
                 this dashboard provides an engaging way to dig deeper. Let’s dive in and explore the data together!
                 """,
-                className="text-center fs-5"
+                className="text-center fs-5", style={"color": "#ffffff"}
             ),
-        ], width=12)
+        ]),
+        style={
+            "background-color": "#1c1c2e",
+            "border-radius": "15px",
+            "box-shadow": "0 4px 8px rgba(0,0,0,0.1)",
+            "padding": "20px",
+        }
+    )
+], width=12)
+
     ]),
 
     dbc.Row([
@@ -277,7 +290,7 @@ def update_polar_chart(selected_genre):
         theta=categories + [categories[0]],
         line_close=True,
         title=f'Style Profile: {selected_genre}',
-        template='plotly_dark'
+        template='plotly_white'
     )
 
     fig.update_traces(fill='toself', line_color='lime')
