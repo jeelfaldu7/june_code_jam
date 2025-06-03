@@ -139,6 +139,9 @@ app = Dash(__name__, external_stylesheets=[dbc.themes.FLATLY])
 artist_title_labels = data['artist'] + " - " + data['title']
 artist_title_values = data.index.to_series()
 
+# genre_group options
+# this sets up the options for k-means clustering by genre
+genre_group_options = [{'label': genre, 'value': genre} for genre in data['genre_group'].unique()]
 
 # App layout
 app.layout = dbc.Container([
@@ -325,9 +328,10 @@ app.layout = dbc.Container([
                     ]),
                     dbc.Row([
                         dcc.Dropdown(
-                            id='cluster-dropdown',
-                            options=[{'label': i[0], 'value': i[1]} for i in zip(artist_title_labels, artist_title_values)],
-                            placeholder="Select a track", 
+                            id='cluster-genre-dropdown',
+                            # options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
+                            options=genre_group_options,
+                            value=data['genre_group'].unique()[0],
                             style={
                                 'background-color': '#f8f8f0',   # cream/off-white background
                                 'color': '#1c1c2e',              # text color (dark navy)
@@ -348,7 +352,7 @@ app.layout = dbc.Container([
                     ]),
                     dbc.Row([
                         dcc.Dropdown(
-                            id='cluster-dropdown',
+                            id='cluster-track-dropdown',
                             options=[{'label': i[0], 'value': i[1]} for i in zip(artist_title_labels, artist_title_values)],
                             placeholder="Select a track", 
                             style={
@@ -457,10 +461,10 @@ def get_preview_audio(artist_and_title):
     return src
 
 
-#callback that finds nearest neighbors of the track from the cluster-dropdown
+#callback that finds nearest neighbors of the track from the cluster-track-dropdown
 @app.callback(     
     Output('cluster-table', 'children'),
-    Input('cluster-dropdown', 'value'),
+    Input('cluster-track-dropdown', 'value'),
     prevent_initial_call=True
 )
 def get_track_nn(track_index):
