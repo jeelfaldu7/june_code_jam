@@ -213,6 +213,32 @@ app.layout = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
+            html.H2('Popular Tracks (Top 10)', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),    
+            html.H5('Choose a genre:', className='text-center',  
+                style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+            ]),
+            dbc.Row([
+                dcc.Dropdown(
+                    id='popular-song-genre-dropdown',
+                    # options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
+                    options=genre_group_options,
+                    value=genre_group_options[0]['value'],
+                    style={
+                        'background-color': '#f8f8f0',   # cream/off-white background
+                        'color': '#1c1c2e',              # text color (dark navy)
+                        'border': '1px solid #2dd4bf',   # border color (teal) as accent
+                        'border-radius': '4px',          # slight border rounding
+                        'padding': '5px'                 # optional padding
+                    }
+                )
+            ]),
+            dbc.Row([
+                dcc.Graph(id='popular-song-graph')  # ID for this plot
+            ]),
+
+    ]),
+    dbc.Row([
+        dbc.Col([
             html.Label('Select Genre:'),
             dcc.Dropdown(
                 id='genre_group-dropdown-graph',
@@ -586,6 +612,38 @@ def update_popularity_by_genre(_):
         orientation='h',
         title='Popularity by Genre (Top 10 Most Popular)',
         labels={'popularity': 'Average Popularity', 'genre_group': 'Genres'},
+        color='popularity',
+        color_continuous_scale='Viridis'
+    )
+    fig.update_layout(yaxis=dict(autorange="reversed"),
+                      template='ggplot2',
+                      paper_bgcolor='#f8f8f0', 
+                      plot_bgcolor="#f8f8f0",
+                      font=dict(
+                          family='Helvetica, Arial, sans-serif',
+                          size=14,
+                          color='#333'),
+    )  # highest popularity on top
+
+    return fig
+
+@app.callback(
+    Output('popular-song-graph', 'figure'),
+    Input('popular-song-genre-dropdown', 'value')  # just to trigger once on app load
+)
+def update_popular_songs(genre):
+    pop_songs = data.copy()
+    if (genre!='all'):
+        pop_songs = pop_songs[pop_songs['genre_group'].isin([genre])]
+    pop_songs = pop_songs.sort_values(by='popularity', ascending=False).head(10).reset_index()
+    pop_songs['artist_title'] = pop_songs['artist'] + " - " + pop_songs['title']
+    fig = px.bar(
+        pop_songs,
+        x='popularity',
+        y='artist_title',
+        orientation='h',
+        title='Popular Tracks (Top 10 Most Popular)',
+        labels={'popularity': 'Popularity', 'artist_title': 'Track'},
         color='popularity',
         color_continuous_scale='Viridis'
     )
