@@ -131,7 +131,7 @@ app.layout = dbc.Container([
             html.P(
                 """
                 This dynamic dashboard explores music listening trends using Spotify data, including audio features 
-                like danceability, energy, tempo, and popularity. Using a publicly available dataset from Kaggle, this 
+                like danceability, energy, loudness, and popularity. Using a publicly available dataset from Kaggle, this 
                 app helps you uncover how these musical characteristics relate to song popularity across genres and time.
                 """,
                 className="text-start fs-5", style={"color": "#ffffff", "text-indent": '40px'}
@@ -181,7 +181,7 @@ app.layout = dbc.Container([
     ]),
     dbc.Row([
         dbc.Col([
-            html.H2('Popularity by Genre (Top 25 Most Popular)', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+            html.H2('Popularity by Genre (Top 10 Most Popular)', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             dcc.Graph(id='popularity-by-genre-graph'),
         ], width=12)
     ]),
@@ -407,14 +407,14 @@ def update_graph(selected_genre, year_range,):
     Input('genre_group-dropdown-graph', 'value')  # just to trigger once on app load
 )
 def update_popularity_by_genre(_):
-    pop_genre = data.groupby('genre_group')['popularity'].mean().sort_values(ascending=False).head(25).reset_index()
+    pop_genre = data.groupby('genre_group')['popularity'].mean().sort_values(ascending=False).head(10).reset_index()
 
     fig = px.bar(
         pop_genre,
         x='popularity',
         y='genre_group',
         orientation='h',
-        title='Popularity by Genre (Top 25 Most Popular)',
+        title='Popularity by Genre (Top 10 Most Popular)',
         labels={'popularity': 'Average Popularity', 'genre_group': 'Genres'},
         color='popularity',
         color_continuous_scale='Viridis'
