@@ -2,6 +2,7 @@
 import re
 import os
 import random
+from decimal import Decimal, localcontext, ROUND_DOWN
 import sklearn
 import numpy as np
 import pandas as pd
@@ -22,6 +23,19 @@ from sklearn.preprocessing import MaxAbsScaler
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import plotly.express as px
+
+# function for truncating floats later, from StackOverflow:
+def truncate(number, places):
+    if not isinstance(places, int):
+        raise ValueError("Decimal places must be an integer.")
+    if places < 1:
+        raise ValueError("Decimal places must be at least 1.")
+    # If you want to truncate to 0 decimal places, just do int(number).
+
+    with localcontext() as context:
+        context.rounding = ROUND_DOWN
+        exponent = Decimal(str(10 ** - places))
+        return Decimal(str(number)).quantize(exponent).to_eng_string()
 
 # Load the dataset and read the data correctly
 data = pd.read_csv('datasets/spotify.csv')
@@ -441,7 +455,8 @@ def get_track_nn(track_index):
                     html.P(nn_results.iloc[i]['title'], className='text-center',  
                         style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
                 ]),dbc.Col([
-                    html.P(nn_results.iloc[i]['distance'], className='text-center',  
+                    # truncate distance to three decimals
+                    html.P(truncate(nn_results.iloc[i]['distance'], 3), className='text-center',  
                         style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
                 ]),
             ])
