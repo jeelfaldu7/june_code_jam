@@ -685,7 +685,7 @@ def update_popular_songs(genre):
         color_continuous_scale='Viridis'
     )
     fig.update_layout(yaxis=dict(autorange="reversed"),
-                      template='ggplot2',
+                      template='ggplot2',  
                       paper_bgcolor='#f8f8f0', 
                       plot_bgcolor="#f8f8f0",
                       font=dict(
