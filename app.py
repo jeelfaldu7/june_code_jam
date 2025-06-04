@@ -192,8 +192,8 @@ app.layout = dbc.Container([
 
     ]),
     dbc.Row([
-    dbc.Col([
         html.H2('Polar Chart for Features by Genre', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+        dbc.Col([
         html.Label(
             'Select Genre for Style Polar Chart:',
             style={
