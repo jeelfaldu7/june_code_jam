@@ -20,6 +20,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 from scipy.spatial.distance import cdist
 from sklearn.preprocessing import StandardScaler
 from sklearn.preprocessing import MaxAbsScaler
+from sklearn.preprocessing import MinMaxScaler
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
 import plotly.express as px
@@ -228,7 +229,10 @@ app.layout = dbc.Container([
                             ], style={"text-indent": '20px', "margin-left": '40px', "color": "#ffffff"}),
                         html.A("More details can be found in Spotify's API documentation.", 
                                href='https://developer.spotify.com/documentation/web-api/reference/get-audio-features',
-                               id='spotify-api-link')
+                               id='spotify-api-link'),
+                               html.P("""
+                                    Note: Loudness and BPM are scaled from 0-100 based on the data available to us.
+                                    """, style={"margin-top": '16px', "color": "#ffffff"}),
                     ],
                     style={
                         "background-color": "#1c1c2e",
@@ -448,8 +452,23 @@ app.layout = dbc.Container([
     Input('genre-polar-dropdown', 'value')
 )
 def update_polar_chart(selected_genre):
+    
+
+    scalable = ['beats_per_minute_bpm', 'loudness_db']
+
+    # scale bpm and loudness based on full data
+    minmax_scaler = MinMaxScaler(feature_range=(0, 100))
+    minmax_scaler.fit(data[scalable])
+
+    # create genre_data as a copy of data, then scale its features as needed
+    genre_data = data.copy()
+    scaled_features = minmax_scaler.transform(genre_data[scalable])
+    scaled_features = pd.DataFrame(scaled_features, columns=scalable)
+    genre_data['beats_per_minute_bpm'] = scaled_features['beats_per_minute_bpm']
+    genre_data['loudness_db'] = scaled_features['loudness_db']
+
     # Filter data for the selected genre
-    genre_data = data[data['top_genre'] == selected_genre]
+    genre_data = genre_data[genre_data['top_genre'] == selected_genre]
 
     # Compute average features
     features = genre_data[[
