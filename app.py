@@ -352,7 +352,7 @@ app.layout = dbc.Container([
                 dbc.Col([
                     dbc.Row([
                         html.H5('Choose a genre:', className='text-center',  
-                        style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                        style={'background-color': '#f8f8f0', "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
                     ]),
                     dbc.Row([
                         dcc.Dropdown(
@@ -689,7 +689,7 @@ def update_kmeans_cluster_graph(genre):
 
 app.layout.children.append(
     dbc.Row([
-        dbc.Col(html.Footer('© 2025 Jeel Faldu / Project. Data Source: Spotify', className='text-center text-muted py-2'), width=12)
+        dbc.Col(html.Footer('© 2025 Jeel Faldu, Ken Klabnik / Project. Data Source: Spotify', className='text-center text-muted py-2'), width=12)
     ])
 
 )
