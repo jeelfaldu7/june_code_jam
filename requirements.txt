@@ -1,7 +1,9 @@
+dash
+dash-bootstrap-components
 pandas
-numpy
 seaborn
 matplotlib
-scipy
 plotly
-dash
+scikit-learn
+scipy
+spotipy
