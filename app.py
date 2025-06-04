@@ -250,7 +250,14 @@ app.layout = dbc.Container([
             href='https://developer.spotify.com/documentation/web-api/reference/get-audio-features',
             id='spotify-api-link',
             style={"color": "#2dd4bf"}  # link color for better contrast
-        )
+        ),
+        html.P(
+            "Note: Loudness and Beats Per Minute are scaled from 0-100 based on the data available to us.",
+            style={
+                "margin-top": '16px',
+                "color": "#ffffff"
+            }
+        ),
     ], width=6, style={
         "background-color": "#1c1c2e",
         "border-radius": "15px",
@@ -490,7 +497,8 @@ dbc.Row([
 )
 def update_polar_chart(selected_genre):
     
-
+    if(selected_genre == None):
+        selected_genre = "adult standards"
     scalable = ['beats_per_minute_bpm', 'loudness_db']
 
     # scale bpm and loudness based on full data
@@ -547,6 +555,8 @@ def update_polar_chart(selected_genre):
     Input('genre_group-dropdown-preview', 'value'),
 )
 def update_preview_list(selected_genre):
+    if(selected_genre == None):
+        selected_genre = "adult standards"
     genre_filter = data[(data['genre_group'] == selected_genre)]
     labels = genre_filter['artist'] + " - " + genre_filter['title']
 
@@ -591,11 +601,14 @@ def get_preview_audio(artist_and_title):
 )
 def get_track_nn(track_index):
 
+    if(track_index==None):
+        return None
+
     #number of results to display
     k = 10
 
     #list of quantitative columns
-    numeric =['year', 'beats_per_minute_bpm', 'energy', 'danceability', 'loudness_db', 
+    numeric = ['year', 'beats_per_minute_bpm', 'energy', 'danceability', 'loudness_db', 
               'liveness', 'valence', 'length_duration', 'acousticness', 'speechiness', 'popularity']
     
     #create dataframe for results
