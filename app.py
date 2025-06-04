@@ -343,7 +343,7 @@ dbc.Row([
     dbc.Row([
         dbc.Col([
             html.H2('Top 10 Artists by Popularity', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
-            
+
             html.Label('Filter by Genre:'),
             dcc.Dropdown(
                 id='artist-genre-dropdown',
@@ -358,22 +358,21 @@ dbc.Row([
                 }
             ),
 
-            dcc.Graph(
-                id='artist-graph',
-            ),
+            html.Label('Filter by Artist: (Optional)'),
             dcc.Dropdown(
                 id='artist-dropdown',
                 options=[{'label': a, 'value': a} for a in sorted(data['artist'].unique())],
                 multi=True,
-                # placeholder="Select one or more artists",
                 style={
-                    'background-color': '#f8f8f0',   # cream/off-white background
-                    'color': '#1c1c2e',              # text color (dark navy)
-                    'border': '1px solid #2dd4bf',   # border color (teal) as accent
-                    'border-radius': '4px',          # slight border rounding
-                    'padding': '5px'                 # optional padding
+                    'background-color': '#f8f8f0',
+                    'color': '#1c1c2e',
+                    'border': '1px solid #2dd4bf',
+                    'border-radius': '4px',
+                    'padding': '5px'
                 }
             ),
+
+            dcc.Graph(id='artist-graph'),
         ], width=12)
     ]),
     dbc.Row([
