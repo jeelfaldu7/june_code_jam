@@ -31,6 +31,7 @@ Kaggle Spotify Top 2000s Mega Dataset
 Includes top songs from the 2000s to early 2020s with audio feature metadata from Spotify.
 
 ## 📁 Project Structure
+```
 spotify-dashboard/
 ├── data/
 │   └── spotify_dataset.csv
@@ -39,6 +40,7 @@ spotify-dashboard/
 ├── app.py
 ├── requirements.txt
 └── README.md
+```
 
 ## 🏆 Bonus Features
 ✅ K-Means clustering with PCA-based visualization
