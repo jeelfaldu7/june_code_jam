@@ -515,7 +515,16 @@ def update_polar_chart(selected_genre):
     ]].mean()
 
     # Prepare data for polar chart
-    categories = features.index.tolist()
+    categories = []
+    for col in features.index:
+        if col == 'beats_per_minute_bpm':
+            categories.append('Beats Per Minute')
+        elif col == 'loudness_db':
+            categories.append('Loudness')
+        else:
+            categories.append(col.replace('_', ' ').title())
+
+
     values = features.tolist()
 
     fig = px.line_polar(
