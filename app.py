@@ -887,7 +887,7 @@ def update_kmeans_cluster_graph(genre, selected_track_index):
 
 app.layout.children.append(
     dbc.Row([
-        dbc.Col(html.Footer('© 2025 Jeel Faldu, Ken Klabnik / Project. Data Source: Spotify', className='text-center text-muted py-2'), width=12)
+        dbc.Col(html.Footer('© 2025 Jeel Faldu, Ken Klabnik, Triso Paneque  / Project. Data Source: Spotify', className='text-center text-muted py-2'), width=12)
     ])
 
 )
