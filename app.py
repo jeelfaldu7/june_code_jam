@@ -498,7 +498,8 @@ dbc.Row([
 )
 def update_polar_chart(selected_genre):
     
-
+    if(selected_genre == None):
+        selected_genre = "adult standards"
     scalable = ['beats_per_minute_bpm', 'loudness_db']
 
     # scale bpm and loudness based on full data
@@ -555,6 +556,8 @@ def update_polar_chart(selected_genre):
     Input('genre_group-dropdown-preview', 'value'),
 )
 def update_preview_list(selected_genre):
+    if(selected_genre == None):
+        selected_genre = "adult standards"
     genre_filter = data[(data['genre_group'] == selected_genre)]
     labels = genre_filter['artist'] + " - " + genre_filter['title']
 
@@ -599,11 +602,14 @@ def get_preview_audio(artist_and_title):
 )
 def get_track_nn(track_index):
 
+    if(track_index==None):
+        return None
+
     #number of results to display
     k = 10
 
     #list of quantitative columns
-    numeric =['year', 'beats_per_minute_bpm', 'energy', 'danceability', 'loudness_db', 
+    numeric = ['year', 'beats_per_minute_bpm', 'energy', 'danceability', 'loudness_db', 
               'liveness', 'valence', 'length_duration', 'acousticness', 'speechiness', 'popularity']
     
     #create dataframe for results
@@ -687,7 +693,6 @@ def update_graph(selected_genre, year_range,):
         color='energy',
         color_continuous_scale='Viridis',
         labels={'popularity': 'Popularity', 'danceability': 'Danceability', 'energy': 'Energy'},
-        title='Popularity vs Danceability',
         hover_data={'artist': True, 'title': True, 'year': True, 'popularity': True},
     )
 
@@ -712,7 +717,6 @@ def update_popularity_by_genre(_):
         x='popularity',
         y='genre_group',
         orientation='h',
-        title='Popularity by Genre (Top 10 Most Popular)',
         labels={'popularity': 'Average Popularity', 'genre_group': 'Genres'},
         color='popularity',
         color_continuous_scale='Viridis'
@@ -744,7 +748,6 @@ def update_popular_songs(genre):
         x='popularity',
         y='artist_title',
         orientation='h',
-        title='Popular Tracks (Top 10 Most Popular)',
         labels={'popularity': 'Popularity', 'artist_title': 'Track'},
         color='popularity',
         color_continuous_scale='Viridis'
