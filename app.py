@@ -272,6 +272,18 @@ app.layout = dbc.Container([
 
 # Additional row for popularity graph
 dbc.Row([
+    html.H4("🕰️ Curious about musical eras?", style={"marginTop": "30px", "color": "#1c1c2e"}),
+    html.Label('Select Year Range:'),
+        html.P(id='era-subtitle', style={"marginBottom": "10px", "color": "#1c1c2e"}),
+
+        dcc.RangeSlider(
+            id='year-slider',
+            min=data['year'].min(),
+            max=data['year'].max(),
+            step=1,
+            marks={str(year): str(year) for year in range(data['year'].min(), data['year'].max()+1, 5)},
+            value=[data['year'].min(), data['year'].max()],
+        ),
     dbc.Col([
         html.H2(
             'Popularity by Genre (Top 10 Most Popular)',
@@ -312,15 +324,7 @@ dbc.Row([
                     'padding': '5px'                 # optional padding
                 }
             ),
-            html.Label('Select Year Range:'),
-            dcc.RangeSlider(
-                id='year-slider',
-                min=data['year'].min(),
-                max=data['year'].max(),
-                step=1,
-                marks={str(year): str(year) for year in range(data['year'].min(), data['year'].max()+1, 5)},
-                value=[data['year'].min(), data['year'].max()],
-            ),
+            
             dcc.Graph(id='popularity-graph'),
         ], width=12)
     ]),
