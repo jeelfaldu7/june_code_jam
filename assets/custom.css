@@ -1,0 +1,18 @@
+body, html {
+  background-color: #f8f8f0 !important; /* cream/off-white for entire page */
+}
+
+.card, .container, .row, .col, .card-body, .table, .dropdown, .form-control, .plotly-graph-div {
+  background-color: #f8f8f0 !important;
+}
+
+.text-center, .text-start, .fs-5, .fw-bold {
+  color: #1c1c2e; /* navy/dark color for contrast */
+}
+
+.tooltip-inner {
+  background-color: #f8f8f0 !important;
+  color: #1c1c2e !important;
+  border: 1px solid #2dd4bf !important;
+  border-radius: 4px !important;
+}
