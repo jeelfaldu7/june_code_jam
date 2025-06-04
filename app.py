@@ -102,7 +102,11 @@ data['genre_group'].where(~data['genre_group'].str.contains('folk'), 'folk', inp
 data['genre_group'].where(~data['genre_group'].str.contains('country'), 'country', inplace=True)
 data['genre_group'].where(~data['genre_group'].str.contains('soul'), 'soul', inplace=True)
 
-#TODO truncate genre_group to keep options from getting too cluttered
+# genre_groups after the first 15 or so can be moved to "other"
+genres = data['genre_group'].value_counts()
+query = ((genres > 15)[genres >15]).index
+
+data['genre_group'].where(data['genre_group'].isin(query.values), 'other', inplace=True)
 
 # Compute the correlation matrix
 corr_matrix = data.corr(numeric_only=True)
@@ -121,7 +125,6 @@ with open('secrets.txt', 'r') as file:
     config = file.read().splitlines()
     CLIENT_ID = config[0]
     CLIENT_SECRET = config[1]
-
 # instantiate spotipy
 auth_manager = SpotifyClientCredentials(
     client_id=CLIENT_ID,
@@ -576,7 +579,7 @@ def update_preview_list(selected_genre):
 def get_preview_audio(artist_and_title):
     #query the Spotify API for the track
 
-    if (type(artist_and_title)==type(None)):
+    if (artist_and_title == None):
         return current_src
     tags = artist_and_title.split(" - ")
 
@@ -677,14 +680,19 @@ def get_track_nn(track_index):
 
     return table_contents
 
-
 #callback that updates graph when genre is selected, or when year slider or plot type radio button are used
 @app.callback(
     Output('popularity-graph', 'figure'),
     Input('genre_group-dropdown-graph', 'value'),
     Input('year-slider', 'value')
     )
-def update_graph(selected_genre, year_range,):
+def update_graph(selected_genre, year_range):
+
+    if (selected_genre == None):
+        selected_genre = 'adult standards'
+    if (year_range == None):
+        year_range = [data['year'].min(), data['year'].max()]
+
     filtered_data = data[(data['genre_group'] == selected_genre) &
                       (data['year'] >= year_range[0]) &
                       (data['year'] <= year_range[1])]
@@ -741,8 +749,11 @@ def update_popularity_by_genre(_):
     Input('popular-song-genre-dropdown', 'value')  # just to trigger once on app load
 )
 def update_popular_songs(genre):
+    if (genre == None):
+        genre = 'all'
+
     pop_songs = data.copy()
-    if (genre!='all'):
+    if (genre != 'all'):
         pop_songs = pop_songs[pop_songs['genre_group'].isin([genre])]
     pop_songs = pop_songs.sort_values(by='popularity', ascending=False).head(10).reset_index()
     pop_songs['artist_title'] = pop_songs['artist'] + " - " + pop_songs['title']
@@ -772,8 +783,11 @@ def update_popular_songs(genre):
     Input('cluster-genre-dropdown', 'value')  # trigger callback to render once
 )
 def update_kmeans_cluster_graph(genre):
+    if (genre == None):
+        genre = 'all'
+
     data_kmeans = data.copy()
-    if (genre!='all'):
+    if (genre != 'all'):
         data_kmeans = data_kmeans[data_kmeans['genre_group'].isin([genre])]
     fig = px.scatter(
         data_kmeans,
@@ -809,6 +823,9 @@ app.layout.children.append(
     Input('year-slider', 'value')
 )
 def update_artist_graph(selected_artists, selected_genre, year_range):
+
+    if (year_range == None):
+        year_range = [data['year'].min(), data['year'].max()]
     filtered_data = data.copy()
 
     # Filter by year range first
@@ -856,6 +873,9 @@ def update_artist_graph(selected_artists, selected_genre, year_range):
     Input('year-slider', 'value')
 )
 def update_artist_dropdown(genre, year_range):
+    if (year_range == None):
+        year_range = [data['year'].min(), data['year'].max()]
+
     filtered = data.copy()
     if genre:
         filtered = filtered[filtered['genre_group'] == genre]
