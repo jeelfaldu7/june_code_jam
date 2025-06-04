@@ -1023,7 +1023,13 @@ def update_cluster_subtitle(track_index):
         return ""
     return "These are the songs most similar in audio features to the selected track. They're determined using K-Means input features and proximity in the feature space."
 
+# for Render hosting
+server = app.server
 
 # Run the app
 if __name__ == '__main__':
-    app.run(debug=True, port=7124)
+    #for local hosting
+    #app.run(debug=True, port=7124)
+
+    #for Render hosting
+    app.run_server(debug=False)
