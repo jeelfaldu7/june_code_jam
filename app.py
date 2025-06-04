@@ -328,6 +328,27 @@ dbc.Row([
         ], width=12)
     ]),
     dbc.Row([
+        html.H2("🔋 Energy Over Time by Genre", className='text-center', style={"color": "#1c1c2e", "marginTop": "40px"}),
+
+        html.Label("Select Genre(s):"),
+        dcc.Dropdown(
+            id='energy-genre-dropdown',
+            options=[{'label': genre, 'value': genre} for genre in sorted(data['genre_group'].unique())],
+            multi=True,
+            placeholder="Select one or more genres...",
+            style={
+                'background-color': '#f8f8f0',
+                'color': '#1c1c2e',
+                'border': '1px solid #2dd4bf',
+                'border-radius': '4px',
+                'padding': '5px'
+            }
+        ),
+
+        dcc.Graph(id='energy-line-graph')
+
+    ]),
+    dbc.Row([
         dbc.Col([
             html.H2('Top 10 Artists by Popularity', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
 
@@ -721,10 +742,22 @@ def update_graph(selected_genre, year_range):
 
 @app.callback(
     Output('popularity-by-genre-graph', 'figure'),
-    Input('genre_group-dropdown-graph', 'value')  # just to trigger once on app load
+    Input('year-slider', 'value')
 )
-def update_popularity_by_genre(_):
-    pop_genre = data.groupby('genre_group')['popularity'].mean().sort_values(ascending=False).head(10).reset_index()
+def update_popularity_by_genre(year_range):
+    start_year, end_year = year_range
+    filtered_data = data[(data['year'] >= start_year) & (data['year'] <= end_year)]
+
+    # Use only the cleaned genre_group column to avoid obscure genres
+    pop_genre = (
+        filtered_data
+        .groupby('genre_group')['popularity']
+        .mean()
+        .sort_values(ascending=False)
+        .head(10)
+        .reset_index()
+    )
+
 
     fig = px.bar(
         pop_genre,
@@ -899,6 +932,46 @@ def update_era_subtitle(year_range):
 
     top_song = era_data.sort_values(by='popularity', ascending=False).iloc[0]
     return f"Oh, so you like the era of \"{top_song['title']}\" ruled by {top_song['artist']}!"
+
+@app.callback(
+    Output('energy-line-graph', 'figure'),
+    [Input('year-slider', 'value'),
+     Input('energy-genre-dropdown', 'value')]
+)
+def update_energy_line_graph(year_range, selected_genres):
+    start_year, end_year = year_range
+    filtered_data = data[(data['year'] >= start_year) & (data['year'] <= end_year)]
+
+    if not selected_genres:
+        return px.line(title="Select at least one genre to display energy trends.")
+
+    filtered_data = filtered_data[filtered_data['genre_group'].isin(selected_genres)]
+
+    energy_over_time = (
+        filtered_data
+        .groupby(['year', 'genre_group'])['energy']
+        .mean()
+        .reset_index()
+    )
+
+    fig = px.line(
+        energy_over_time,
+        x='year',
+        y='energy',
+        color='genre_group',
+        markers=True,
+        title='Energy Trends Over Time',
+        labels={'energy': 'Average Energy', 'year': 'Year', 'genre_group': 'Genre'}
+    )
+
+    fig.update_layout(
+        template='ggplot2',
+        paper_bgcolor='#f8f8f0',
+        plot_bgcolor='#f8f8f0',
+        font=dict(family='Helvetica, Arial, sans-serif', size=14, color='#333')
+    )
+
+    return fig
 
 
 # Run the app
