@@ -376,7 +376,7 @@ app.layout = dbc.Container([
                 dbc.Col([
                     dbc.Row([
                         html.H5('Choose a track:', className='text-center',  
-                        style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                        style={'background-color': '#f8f8f0', "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
                     ]),
                     dbc.Row([
                         dcc.Dropdown(
@@ -551,15 +551,15 @@ def get_track_nn(track_index):
             dbc.Row([
                 dbc.Col([
                     html.P(nn_results.iloc[i]['artist'], className='text-center',  
-                        style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                        style={"background-color": "#f8f8f0","color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
                 ]),
                 dbc.Col([
                     html.P(nn_results.iloc[i]['title'], className='text-center',  
-                        style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                        style={"background-color": "#f8f8f0", "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
                 ]),dbc.Col([
                     # truncate distance to three decimals
                     html.P(truncate(nn_results.iloc[i]['distance'], 3), className='text-center',  
-                        style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                        style={"background-color": "#f8f8f0", "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
                 ]),
             ])
         )
