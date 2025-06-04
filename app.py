@@ -193,6 +193,7 @@ app.layout = dbc.Container([
     ]),
     dbc.Row([
     dbc.Col([
+        html.H2('Polar Chart for Features by Genre', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
         html.Label(
             'Select Genre for Style Polar Chart:',
             style={
@@ -309,6 +310,7 @@ dbc.Row([
     ]),
     dbc.Row([
         dbc.Col([
+            html.H2('Popularity & Danceability', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             html.Label('Select Genre:'),
             dcc.Dropdown(
                 id='genre_group-dropdown-graph',
@@ -342,8 +344,6 @@ dbc.Row([
                 marks={str(year): str(year) for year in range(data['year'].min(), data['year'].max()+1, 5)},
                 value=[data['year'].min(), data['year'].max()],
             ),
-
-            html.H2('Popularity & Danceability', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             dcc.Graph(id='popularity-graph'),
         ], width=12)
     ]),
