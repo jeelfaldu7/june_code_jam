@@ -365,10 +365,11 @@ dbc.Row([
                 }
             ),
 
-            html.Label('Filter by Artist: (Optional)'),
+            html.Label('Filter by Artist:'),
             dcc.Dropdown(
                 id='artist-dropdown',
                 options=[{'label': a, 'value': a} for a in sorted(data['artist'].unique())],
+                placeholder = 'Select Specific Artists to see a Popularity Comparison',
                 multi=True,
                 style={
                     'background-color': '#f8f8f0',
@@ -382,8 +383,11 @@ dbc.Row([
             dcc.Graph(id='artist-graph'),
         ], width=12)
     ]),
+
     dbc.Row([
         dbc.Col([
+            html.H4("🎧 Ready to preview a song?", style={"marginTop": "30px", "color": "#1c1c2e"}),
+            html.P("Use the dropdowns below to select a genre and pick a song to hear a short preview!", style={"marginBottom": "10px", "color": "#1c1c2e"}),
             html.Label('Select Genre for Previews:'),
             dcc.Dropdown(
                 id='genre_group-dropdown-preview',
