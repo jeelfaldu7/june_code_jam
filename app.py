@@ -735,7 +735,6 @@ def update_popular_songs(genre):
         x='popularity',
         y='artist_title',
         orientation='h',
-        title='Popular Tracks (Top 10 Most Popular)',
         labels={'popularity': 'Popularity', 'artist_title': 'Track'},
         color='popularity',
         color_continuous_scale='Viridis'
