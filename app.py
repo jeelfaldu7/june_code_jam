@@ -367,83 +367,75 @@ app.layout = dbc.Container([
             ])
         ], width=12)
     ]),
-    dbc.Table(
-        #header
-        [html.Thead()] + 
-        [html.Tbody([
+    dbc.Row([
+        dbc.Col([
+            html.H2('K-Means Clusters (PCA Projection)', className='text-center',  
+                    style={'background-color': '#f8f8f0', "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+        ], width=12),
+    ]),
+    dbc.Row([
+        dbc.Col([
+            html.P('Investigate tracks that are similar to each other here!', className='text-center',  
+                   style={'background-color': '#f8f8f0', "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+        ], width=12),
+    ]),
+    dbc.Row([
+        dbc.Col([
             dbc.Row([
-                dbc.Col([
-                    html.H2('K-Means Clusters (PCA Projection)', className='text-center',  
-                            style={'background-color': '#f8f8f0', "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
-                ], width=12),
+                html.H5('Choose a genre:', className='text-center',  
+                style={'background-color': '#f8f8f0', "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             ]),
             dbc.Row([
-                dbc.Col([
-                    html.P('Investigate tracks that are similar to each other here!', className='text-center',  
-                           style={'background-color': '#f8f8f0', "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
-                ], width=12),
+                dcc.Dropdown(
+                    id='cluster-genre-dropdown',
+                    options=genre_group_options,
+                    value=genre_group_options[0]['value'],
+                    style={
+                        'background-color': '#f8f8f0',
+                        'color': '#1c1c2e',
+                        'border': '1px solid #2dd4bf',
+                        'border-radius': '4px',
+                        'padding': '5px'
+                    }
+                )
             ]),
             dbc.Row([
-                dbc.Col([
-                    dbc.Row([
-                        html.H5('Choose a genre:', className='text-center',  
-                        style={'background-color': '#f8f8f0', "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
-                    ]),
-                    dbc.Row([
-                        dcc.Dropdown(
-                            id='cluster-genre-dropdown',
-                            # options=[{'label': genre, 'value': genre} for genre in data['genre_group'].unique()],
-                            options=genre_group_options,
-                            value=genre_group_options[0]['value'],
-                            style={
-                                'background-color': '#f8f8f0',   # cream/off-white background
-                                'color': '#1c1c2e',              # text color (dark navy)
-                                'border': '1px solid #2dd4bf',   # border color (teal) as accent
-                                'border-radius': '4px',          # slight border rounding
-                                'padding': '5px'                 # optional padding
-                            }
-                        )
-                    ]),
-                    dbc.Row([
-                        dcc.Graph(id='kmeans-cluster-graph')  # ID for this plot
-                    ]),
-                ]),
-                dbc.Col([
-                    dbc.Row([
-                        html.H5('Choose a track:', className='text-center',  
-                        style={'background-color': '#f8f8f0', "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
-                    ]),
-                    dbc.Row([
-                        dcc.Dropdown(
-                            id='cluster-track-dropdown',
-                            options=[{'label': i[0], 'value': i[1]} for i in zip(artist_title_labels, artist_title_values)],
-                            placeholder="Select a track", 
-                            style={
-                                'background-color': '#f8f8f0',   # cream/off-white background
-                                'color': '#1c1c2e',              # text color (dark navy)
-                                'border': '1px solid #2dd4bf',   # border color (teal) as accent
-                                'border-radius': '4px',          # slight border rounding
-                                'padding': '5px'                 # optional padding
-                }
-                        ),
-                    ]),
-                    dbc.Row([
-                        dbc.Table(
-                            id='cluster-table',
-                            style={
-                                'background-color': '#f8f8f0',   # cream/off-white background
-                                'color': '#1c1c2e',              # text color (dark navy)
-                                'border': '1px solid #2dd4bf',   # border color (teal) as accent
-                                'border-radius': '4px',          # slight border rounding
-                                'padding': '5px'                 # optional padding
-                } 
-                        )
-                    ])
-                ]),
+                dcc.Graph(id='kmeans-cluster-graph')
             ]),
-        ])],
-        id='k-means-display-area'
-    ),
+        ]),
+        dbc.Col([
+            dbc.Row([
+                html.H5('Choose a track:', className='text-center',  
+                style={'background-color': '#f8f8f0', "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+            ]),
+            dbc.Row([
+                dcc.Dropdown(
+                    id='cluster-track-dropdown',
+                    options=[{'label': i[0], 'value': i[1]} for i in zip(artist_title_labels, artist_title_values)],
+                    placeholder="Select a track", 
+                    style={
+                        'background-color': '#f8f8f0',
+                        'color': '#1c1c2e',
+                        'border': '1px solid #2dd4bf',
+                        'border-radius': '4px',
+                        'padding': '5px'
+                    }
+                ),
+            ]),
+            dbc.Row([
+                dbc.Table(
+                    id='cluster-table',
+                    style={
+                        'background-color': '#f8f8f0',
+                        'color': '#1c1c2e',
+                        'border': '1px solid #2dd4bf',
+                        'border-radius': '4px',
+                        'padding': '5px'
+                    } 
+                )
+            ])
+        ]),
+    ]),
 ], 
     fluid=True,
     style={"background-color": "#f8f8f0", "min-height": "100vh", "padding": "20px"}
