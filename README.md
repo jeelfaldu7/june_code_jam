@@ -52,7 +52,7 @@ spotify-dashboard/
 ✅ Storytelling-driven UI with dynamic chart updates
 
 ## 🌐 Live Demo 
-Check out the deployed version of our project here: [Interactive Music Trends Dashboard](https://june-code-jam.onrender.com/)
+Check out the deployed version of our project here: [Interactive Music Trends Dashboard](https://june-code-jam.onrender.com/).
 
 Explore the interactive visualizations and insights generated from the data we’ve analyzed!
 
