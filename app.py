@@ -107,7 +107,7 @@ data['genre_group'].where(~data['genre_group'].str.contains('soul'), 'soul', inp
 # Compute the correlation matrix
 corr_matrix = data.corr(numeric_only=True)
 
-# Calculating average features per top_genre
+# Calculating average features per genre_group
 style_features = data.groupby('genre_group').mean(numeric_only=True)[[
     'beats_per_minute_bpm', 'energy', 'danceability', 'loudness_db',
     'liveness', 'valence', 'acousticness', 'speechiness', 'popularity'
@@ -209,9 +209,9 @@ app.layout = dbc.Container([
             id='genre-polar-dropdown',
             options=[
                 {'label': genre, 'value': genre} 
-                for genre in data['top_genre'].unique()
+                for genre in data['genre_group'].unique()
             ],
-            value=data['top_genre'].unique()[0],
+            value=data['genre_group'].unique()[0],
             style={
                 'background-color': '#f8f8f0',
                 'color': '#1c1c2e',
@@ -517,7 +517,7 @@ def update_polar_chart(selected_genre):
     genre_data['loudness_db'] = scaled_features['loudness_db']
 
     # Filter data for the selected genre
-    genre_data = genre_data[genre_data['top_genre'] == selected_genre]
+    genre_data = genre_data[genre_data['genre_group'] == selected_genre]
 
     # Compute average features
     features = genre_data[[
@@ -780,7 +780,7 @@ def update_kmeans_cluster_graph(genre):
         x='pca1',
         y='pca2',
         color='cluster',
-        hover_data=['title', 'artist', 'top_genre', 'year'],
+        hover_data=['title', 'artist', 'genre_group', 'year'],
         labels={'pca1': 'PCA1', 'pca2': 'PCA2', 'cluster':'Cluster'},
         title=f'K-Means Clustering of Songs (k={k})',
         color_continuous_scale='Viridis'  # Or discrete color sequence
