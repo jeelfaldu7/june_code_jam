@@ -273,17 +273,16 @@ app.layout = dbc.Container([
 # Additional row for popularity graph
 dbc.Row([
     html.H4("🕰️ Curious about musical eras?", style={"marginTop": "30px", "color": "#1c1c2e"}),
-    html.Label('Select Year Range:'),
-        html.P(id='era-subtitle', style={"marginBottom": "10px", "color": "#1c1c2e"}),
+    html.P(id='era-subtitle', style={"marginBottom": "10px", "color": "#1c1c2e"}),
 
-        dcc.RangeSlider(
-            id='year-slider',
-            min=data['year'].min(),
-            max=data['year'].max(),
-            step=1,
-            marks={str(year): str(year) for year in range(data['year'].min(), data['year'].max()+1, 5)},
-            value=[data['year'].min(), data['year'].max()],
-        ),
+    dcc.RangeSlider(
+        id='year-slider',
+        min=data['year'].min(),
+        max=data['year'].max(),
+        step=1,
+        marks={str(year): str(year) for year in range(data['year'].min(), data['year'].max()+1, 5)},
+        value=[data['year'].min(), data['year'].max()],
+    ),
     dbc.Col([
         html.H2(
             'Popularity by Genre (Top 10 Most Popular)',
@@ -886,6 +885,21 @@ def update_artist_dropdown(genre, year_range):
     filtered = filtered[(filtered['year'] >= year_range[0]) & (filtered['year'] <= year_range[1])]
     options = [{'label': a, 'value': a} for a in sorted(filtered['artist'].unique())]
     return options
+
+@app.callback(
+    Output('era-subtitle', 'children'),
+    Input('year-slider', 'value')
+)
+def update_era_subtitle(year_range):
+    start_year, end_year = year_range
+    era_data = data[(data['year'] >= start_year) & (data['year'] <= end_year)]
+
+    if era_data.empty:
+        return "No popular songs found in this era. Maybe a hidden gem?"
+
+    top_song = era_data.sort_values(by='popularity', ascending=False).iloc[0]
+    return f"Oh, so you like the era of \"{top_song['title']}\" ruled by {top_song['artist']}!"
+
 
 # Run the app
 if __name__ == '__main__':
