@@ -60,8 +60,8 @@ Implement a recommendation engine based on user preferences
 
 ## 🤝 Credits
 This project was created as part of the TripleTen Data Science program. Special thanks to:
-TripleTen instructors and peers for ongoing support and feedback
-Kaggle for the dataset
+  - TripleTen instructors and peers for ongoing support and feedback
+  - Kaggle for the dataset
 
 ## 🛡️ License
 This project is licensed under the MIT License.
