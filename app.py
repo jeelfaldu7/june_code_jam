@@ -145,6 +145,10 @@ genre_group_options = [{'label': genre, 'value': genre} for genre in data['genre
 all_label = {'label': 'All Genres', 'value': 'all'}
 genre_group_options.insert(0, all_label)
 
+# current_src
+# this variable holds the URL for the song preview, which works around a bug
+current_src = None
+
 # App layout
 app.layout = dbc.Container([
     dbc.Row([
@@ -501,6 +505,8 @@ def update_preview_list(selected_genre):
 def get_preview_audio(artist_and_title):
     #query the Spotify API for the track
 
+    if (type(artist_and_title)==type(None)):
+        return current_src
     tags = artist_and_title.split(" - ")
 
     #note: %3A is HTML URL encoding for colon
@@ -511,12 +517,12 @@ def get_preview_audio(artist_and_title):
     #for URL encoding, replace spaces with +
     #query = query.replace(" ", "+")
 
-    print(query)
     search_result = sp.search(q=query, type='track', limit=1)
     track_id = search_result["tracks"]["items"][0]["id"]
-    print("track id:", track_id)
     src = "https://open.spotify.com/embed/track/" + track_id + "?utm_source=generator"
-    print("src:", src)
+
+    #store src in current_src in case artist_and_title becomes None
+    current_src = src
     return src
 
 
