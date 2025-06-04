@@ -502,6 +502,12 @@ dbc.Row([
                 ),
             ]),
             dbc.Row([
+                html.P(id='cluster-subtitle', style={
+                    "color": "#1c1c2e",
+                    "fontStyle": "italic",
+                    "marginBottom": "10px",
+                    "marginTop": "10px"
+                }),
                 dbc.Table(
                     id='cluster-table',
                     style={
@@ -816,34 +822,68 @@ def update_popular_songs(genre):
 
 @app.callback(
     Output('kmeans-cluster-graph', 'figure'),
-    Input('cluster-genre-dropdown', 'value')  # trigger callback to render once
+    Input('cluster-genre-dropdown', 'value'),
+    Input('cluster-track-dropdown', 'value')
 )
-def update_kmeans_cluster_graph(genre):
-    if (genre == None):
+def update_kmeans_cluster_graph(genre, selected_track_index):
+    if genre is None:
         genre = 'all'
 
-    data_kmeans = data.copy()
-    if (genre != 'all'):
-        data_kmeans = data_kmeans[data_kmeans['genre_group'].isin([genre])]
+    df = data.copy()
+    if genre != 'all':
+        df = df[df['genre_group'] == genre]
+
+    df['highlight'] = 'Other Tracks'
+
+    selected_cluster = None
+    selected_point = None
+
+    if selected_track_index is not None:
+        selected_cluster = data.loc[selected_track_index, 'cluster']
+        selected_point = data.loc[selected_track_index]
+        df.loc[df['cluster'] == selected_cluster, 'highlight'] = f'Cluster {selected_cluster}'
+
+    # Base scatter plot with colors
     fig = px.scatter(
-        data_kmeans,
+        df,
         x='pca1',
         y='pca2',
-        color='cluster',
+        color='highlight',
         hover_data=['title', 'artist', 'genre_group', 'year'],
-        labels={'pca1': 'PCA1', 'pca2': 'PCA2', 'cluster':'Cluster'},
-        title=f'K-Means Clustering of Songs (k={k})',
-        color_continuous_scale='Viridis'  # Or discrete color sequence
+        color_discrete_map={
+            'Other Tracks': 'lightgray',
+            f'Cluster {selected_cluster}': 'royalblue',
+            'Selected Track': 'crimson'
+        } if selected_cluster is not None else {},
+        labels={'pca1': 'PCA1', 'pca2': 'PCA2'},
+        title='K-Means Clustering of Songs (PCA)'
     )
+
+    # Emphasize selected track with larger size & different marker
+    if selected_point is not None:
+        fig.add_scatter(
+            x=[selected_point['pca1']],
+            y=[selected_point['pca2']],
+            mode='markers+text',
+            marker=dict(size=14, symbol='star', color='crimson', line=dict(width=2, color='black')),
+            name='Selected Track',
+            text=[selected_point['title']],
+            textposition='top center',
+            hovertext=f"{selected_point['artist']} - {selected_point['title']}",
+            showlegend=True
+        )
+
     fig.update_layout(
         height=600,
         width=900,
         template='ggplot2',
         font=dict(family='Helvetica, Arial, sans-serif', size=14, color='#333'),
         paper_bgcolor='#f8f8f0',
-        plot_bgcolor="#f8f8f0"
+        plot_bgcolor='#f8f8f0'
     )
+
     return fig
+
 
 app.layout.children.append(
     dbc.Row([
@@ -972,6 +1012,16 @@ def update_energy_line_graph(year_range, selected_genres):
     )
 
     return fig
+
+@app.callback(
+    Output('cluster-subtitle', 'children'),
+    Input('cluster-track-dropdown', 'value'),
+    prevent_initial_call=True
+)
+def update_cluster_subtitle(track_index):
+    if track_index is None:
+        return ""
+    return "These are the songs most similar in audio features to the selected track. They're determined using K-Means input features and proximity in the feature space."
 
 
 # Run the app
