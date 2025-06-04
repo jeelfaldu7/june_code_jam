@@ -191,65 +191,89 @@ app.layout = dbc.Container([
 ], id="title-card", width=12)
 
     ]),
-    dbc.Table(
-    #header
-        [html.Thead()] + 
-        [ 
-            html.Tbody([
-                dbc.Row([
-                    dbc.Col([
-                        html.Label('Select Genre for Style Polar Chart:'),
-                        dcc.Dropdown(
-                            id='genre-polar-dropdown',
-                            options=[{'label': genre, 'value': genre} for genre in data['top_genre'].unique()],
-                            value=data['top_genre'].unique()[0],
-                            style={
-                                'background-color': '#f8f8f0',   # cream/off-white background
-                                'color': '#1c1c2e',              # text color (dark navy)
-                                'border': '1px solid #2dd4bf',   # border color (teal) as accent
-                                'border-radius': '4px',          # slight border rounding
-                                'padding': '5px'                 # optional padding
-                            }
-                        ),
-                        dcc.Graph(id='polar-style-chart')
-                    ]),
-                    dbc.Col([
-                        dbc.Row([html.Label('')]), #for whitespace
-                        html.P("""
-                            Our data contains many features. Here are explanations of a few of them:
-                            """, style={"margin-top": '16px', "color": "#ffffff"}),
-                            html.Ul([
-                                html.Li("Acousticness: confidence that the track is acoustic. Non-acoustic music is 0, acoustic music is 100."),
-                                html.Li("Danceability: how suitable a track is for dancing, rated from 0 to 100."),
-                                html.Li("Energy: how energetic the track feels. Fast, loud, and noisy tracks score high."),
-                                html.Li("Liveness: scores high if an audience can be heard in the recording."),
-                                html.Li("Speechiness: scores high if the track is mostly spoken words."),
-                                html.Li("Valence: cheery or euphoric music scores high, while sad or angry music scores low."),
-                                html.Li("Popularity: based on an internal Spotify algorithm, tracks that are played a lot, especially recently, score high.")
-                            ], style={"text-indent": '20px', "margin-left": '40px', "color": "#ffffff"}),
-                        html.A("More details can be found in Spotify's API documentation.", 
-                               href='https://developer.spotify.com/documentation/web-api/reference/get-audio-features',
-                               id='spotify-api-link'),
-                               html.P("""
-                                    Note: Loudness and BPM are scaled from 0-100 based on the data available to us.
-                                    """, style={"margin-top": '16px', "color": "#ffffff"}),
-                    ],
-                    style={
-                        "background-color": "#1c1c2e",
-                        "border-radius": "15px",
-                        "box-shadow": "0 4px 8px rgba(0,0,0,0.1)",
-                        "padding": "20px",
-                    })
-                ])
-            ])
-        ], id="polar-chart-display-area"
-    ),
     dbc.Row([
-        dbc.Col([
-            html.H2('Popularity by Genre (Top 10 Most Popular)', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
-            dcc.Graph(id='popularity-by-genre-graph'),
-        ], width=12)
-    ]),
+    dbc.Col([
+        html.Label(
+            'Select Genre for Style Polar Chart:',
+            style={
+                'background-color': '#f8f8f0',
+                'color': '#1c1c2e',
+                'padding': '5px',
+                'border-radius': '4px',
+                'display': 'inline-block',
+                'margin-top': '10px'
+            }
+        ),
+        dcc.Dropdown(
+            id='genre-polar-dropdown',
+            options=[
+                {'label': genre, 'value': genre} 
+                for genre in data['top_genre'].unique()
+            ],
+            value=data['top_genre'].unique()[0],
+            style={
+                'background-color': '#f8f8f0',
+                'color': '#1c1c2e',
+                'border': '1px solid #2dd4bf',
+                'border-radius': '4px',
+                'padding': '5px'
+            }
+        ),
+        dcc.Graph(id='polar-style-chart')
+    ], width=6),
+
+    dbc.Col([
+        # Add an empty label for whitespace
+        dbc.Row(html.Label('')),
+        html.P(
+            "Our data contains many features. Here are explanations of a few of them:",
+            style={
+                "margin-top": '16px',
+                "color": "#ffffff"
+            }
+        ),
+        html.Ul([
+            html.Li("Acousticness: confidence that the track is acoustic. Non-acoustic music is 0, acoustic music is 100."),
+            html.Li("Danceability: how suitable a track is for dancing, rated from 0 to 100."),
+            html.Li("Energy: how energetic the track feels. Fast, loud, and noisy tracks score high."),
+            html.Li("Liveness: scores high if an audience can be heard in the recording."),
+            html.Li("Speechiness: scores high if the track is mostly spoken words."),
+            html.Li("Valence: cheery or euphoric music scores high, while sad or angry music scores low."),
+            html.Li("Popularity: based on an internal Spotify algorithm, tracks that are played a lot, especially recently, score high.")
+        ], style={
+            "text-indent": '20px',
+            "margin-left": '40px',
+            "color": "#ffffff"
+        }),
+        html.A(
+            "More details can be found in Spotify's API documentation.",
+            href='https://developer.spotify.com/documentation/web-api/reference/get-audio-features',
+            id='spotify-api-link',
+            style={"color": "#2dd4bf"}  # link color for better contrast
+        )
+    ], width=6, style={
+        "background-color": "#1c1c2e",
+        "border-radius": "15px",
+        "box-shadow": "0 4px 8px rgba(0,0,0,0.1)",
+        "padding": "20px"
+    }),
+], id="polar-chart-display-area"),
+
+# Additional row for popularity graph
+dbc.Row([
+    dbc.Col([
+        html.H2(
+            'Popularity by Genre (Top 10 Most Popular)',
+            className='text-center',
+            style={
+                "color": "#1c1c2e",
+                "textAlign": "center",
+                "marginTop": "20px"
+            }
+        ),
+        dcc.Graph(id='popularity-by-genre-graph'),
+    ], width=12)
+]),
     dbc.Row([
         dbc.Col([
             html.H2('Popular Tracks (Top 10)', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),    
