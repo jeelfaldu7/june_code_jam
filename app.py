@@ -250,7 +250,14 @@ app.layout = dbc.Container([
             href='https://developer.spotify.com/documentation/web-api/reference/get-audio-features',
             id='spotify-api-link',
             style={"color": "#2dd4bf"}  # link color for better contrast
-        )
+        ),
+        html.P(
+            "Note: Loudness and Beats Per Minute are scaled from 0-100 based on the data available to us.",
+            style={
+                "margin-top": '16px',
+                "color": "#ffffff"
+            }
+        ),
     ], width=6, style={
         "background-color": "#1c1c2e",
         "border-radius": "15px",
