@@ -319,7 +319,21 @@ app.layout = dbc.Container([
     dbc.Row([
         dbc.Col([
             html.H2('Top 10 Artists by Popularity', className='text-center',  style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
-            html.Label("Select Artists:", className="fw-bold"),  # Use Bootstrap classes for styling
+            
+            html.Label('Filter by Genre:'),
+            dcc.Dropdown(
+                id='artist-genre-dropdown',
+                options=genre_group_options,
+                placeholder='Select a genre (optional)',
+                style={
+                    'background-color': '#f8f8f0',
+                    'color': '#1c1c2e',
+                    'border': '1px solid #2dd4bf',
+                    'border-radius': '4px',
+                    'padding': '5px'
+                }
+            ),
+
             dcc.Graph(
                 id='artist-graph',
             ),
@@ -327,7 +341,7 @@ app.layout = dbc.Container([
                 id='artist-dropdown',
                 options=[{'label': a, 'value': a} for a in sorted(data['artist'].unique())],
                 multi=True,
-                placeholder="Select one or more artists",
+                # placeholder="Select one or more artists",
                 style={
                     'background-color': '#f8f8f0',   # cream/off-white background
                     'color': '#1c1c2e',              # text color (dark navy)
@@ -744,11 +758,34 @@ app.layout.children.append(
 
 @app.callback(
     Output('artist-graph', 'figure'),
-    Input('artist-dropdown', 'value')
+    Input('artist-dropdown', 'value'),
+    Input('artist-genre-dropdown', 'value'),
+    Input('year-slider', 'value')
 )
-def update_artist_graph(_):
-    # Filter to selected artists
-    top_artists = data.groupby('artist')['popularity'].mean().sort_values(ascending=False).head(10).reset_index()
+def update_artist_graph(selected_artists, selected_genre, year_range):
+    filtered_data = data.copy()
+
+    # Filter by year range first
+    filtered_data = filtered_data[
+        (filtered_data['year'] >= year_range[0]) &
+        (filtered_data['year'] <= year_range[1])
+    ]
+
+    # Then filter by genre if one is selected
+    if selected_genre:
+        filtered_data = filtered_data[filtered_data['genre_group'] == selected_genre]
+
+    # Then filter by selected artists if any
+    if selected_artists:
+        filtered_data = filtered_data[filtered_data['artist'].isin(selected_artists)]
+
+    top_artists = (
+        filtered_data.groupby('artist')['popularity']
+        .mean()
+        .sort_values(ascending=False)
+        .head(10)
+        .reset_index()
+    )
 
     fig = px.bar(
         top_artists,
@@ -759,12 +796,26 @@ def update_artist_graph(_):
         orientation='h',
         color_continuous_scale='Viridis',
         labels={'popularity': 'Popularity', 'artist': 'Artists'}
-
     )
     fig.update_layout(yaxis=dict(autorange="reversed"),
                       paper_bgcolor='#f8f8f0',  
                       plot_bgcolor="#f8f8f0")
     return fig
+
+
+# Link this dropdown to the callback by syncing IDs
+@app.callback(
+    Output('artist-dropdown', 'options'),
+    Input('artist-genre-dropdown', 'value'),
+    Input('year-slider', 'value')
+)
+def update_artist_dropdown(genre, year_range):
+    filtered = data.copy()
+    if genre:
+        filtered = filtered[filtered['genre_group'] == genre]
+    filtered = filtered[(filtered['year'] >= year_range[0]) & (filtered['year'] <= year_range[1])]
+    options = [{'label': a, 'value': a} for a in sorted(filtered['artist'].unique())]
+    return options
 
 # Run the app
 if __name__ == '__main__':
