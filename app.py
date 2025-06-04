@@ -569,15 +569,15 @@ def get_track_nn(track_index):
         dbc.Row([
             dbc.Col([
                 html.P('Artist', className='text-center',  
-                    style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                    style={"background-color": "#f8f8f0", "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             ]),
             dbc.Col([
                 html.P('Title', className='text-center',  
-                    style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                    style={"background-color": "#f8f8f0", "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             ]),
             dbc.Col([
                 html.P('Distance', className='text-center',  
-                    style={"color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
+                    style={"background-color": "#f8f8f0", "color": "#1c1c2e", "textAlign": "center", "marginTop": "20px"}),
             ]),
         ]),
     ]
