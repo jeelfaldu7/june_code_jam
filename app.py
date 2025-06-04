@@ -680,7 +680,6 @@ def update_graph(selected_genre, year_range,):
         color='energy',
         color_continuous_scale='Viridis',
         labels={'popularity': 'Popularity', 'danceability': 'Danceability', 'energy': 'Energy'},
-        title='Popularity vs Danceability',
         hover_data={'artist': True, 'title': True, 'year': True, 'popularity': True},
     )
 
@@ -705,7 +704,6 @@ def update_popularity_by_genre(_):
         x='popularity',
         y='genre_group',
         orientation='h',
-        title='Popularity by Genre (Top 10 Most Popular)',
         labels={'popularity': 'Average Popularity', 'genre_group': 'Genres'},
         color='popularity',
         color_continuous_scale='Viridis'
